@@ -4,14 +4,8 @@ using UnityEngine;
 
 public class FollowPlayerX : MonoBehaviour
 {
-    public GameObject plane;
-    private Vector3 offset;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
+    [SerializeField] private GameObject plane;
+    [SerializeField] private Vector3 offset;
 
     // Update is called once per frame
     void Update()
