@@ -5,7 +5,6 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerBallController : MonoBehaviour
 {
-    [SerializeField] private float acceleration = 10f;
     [SerializeField] private float maxVelocity = 10f;
     [SerializeField] private float jumpForce = 20f;
 
