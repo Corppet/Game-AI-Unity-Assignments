@@ -97,7 +97,40 @@ public class Bot : MonoBehaviour
 
         Seek(chosenSpot);
     }
-    
+
+    private void CleverHide()
+    {
+        float dist = Mathf.Infinity;
+        Vector3 chosenSpot = Vector3.zero;
+        Vector3 chosenDir = Vector3.zero;
+        GameObject chosenObject = World.Instance.GetHidingSpots()[0];
+
+        for (int i = 0; i < World.Instance.GetHidingSpots().Length; i++)
+        {
+            Vector3 hidingSpot = World.Instance.GetHidingSpots()[i].transform.position;
+            Vector3 hideDir = hidingSpot - target.position;
+            Vector3 hidePos = hidingSpot + hideDir.normalized * 5f;
+
+            if (Vector3.Distance(transform.position, hidePos) < dist)
+            {
+                dist = Vector3.Distance(transform.position, hidePos);
+                chosenSpot = hidePos;
+                chosenDir = hideDir;
+                chosenObject = World.Instance.GetHidingSpots()[i];
+                dist = Vector3.Distance(transform.position, hidePos);
+            }
+        }
+
+        Collider hideCol = chosenObject.GetComponent<Collider>();
+        Ray backRay = new Ray(chosenSpot, -chosenDir.normalized);
+        RaycastHit info;
+        float distance = 100f;
+        hideCol.Raycast(backRay, out info, distance);
+
+
+        Seek(info.point + chosenDir.normalized * 5f);
+    }
+
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -106,8 +139,32 @@ public class Bot : MonoBehaviour
         wanderTarget = Vector3.zero;
     }
     
+    private bool CanSeeTarget()
+    {
+        RaycastHit raycastInfo;
+        Vector3 targetDir = target.position - transform.position;
+
+        // check if the target is within the agent's field of view
+        if (Vector3.Angle(transform.forward, targetDir) > 45f)
+        {
+            return false;
+        }
+
+        // check if the agent has line of sight of the target
+        if (Physics.Raycast(transform.position, targetDir, out raycastInfo)
+            && raycastInfo.collider.gameObject == target.gameObject)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
     private void Update()
     {
-        Hide();
+        if (CanSeeTarget())
+            CleverHide();
     }
 }
