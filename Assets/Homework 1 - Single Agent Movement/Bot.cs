@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-[RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(LineRenderer), typeof(NavMeshAgent))]
 public class Bot : MonoBehaviour
 {
     [Header("Wander Movement")]
@@ -17,6 +17,12 @@ public class Bot : MonoBehaviour
     [SerializeField] private float cooldownDuration = 5f;
     [SerializeField] private float targetRange = 10f;
 
+    [Space(5)]
+
+    [Header("Line Renderer")]
+    [Range(10, 1000)]
+    [SerializeField] private int circleSegments = 100;
+
     [Space(10)]
     
     [SerializeField] private Transform target;
@@ -25,14 +31,47 @@ public class Bot : MonoBehaviour
     private Drive targetDrive;
     private bool isOnCooldown;
 
+    private LineRenderer lineRenderer;
+    private LineRenderer targetRenderer;
+
+    /// <summary>
+    /// Draw a circle around a given point.
+    /// </summary>
+    /// <param name="center"></param>
+    /// <param name="radius"></param>
+    private void DrawCircle(Vector3 center, float radius)
+    {
+        lineRenderer.positionCount = circleSegments + 1;
+        lineRenderer.startWidth = 0.1f;
+        lineRenderer.endWidth = 0.1f;
+
+        float deltaTheta = (2f * Mathf.PI) / circleSegments;
+        float theta = 0f;
+
+        for (int i = 0; i < circleSegments + 1; i++)
+        {
+            Vector3 pos = center + radius * new Vector3(Mathf.Cos(theta), 0f, Mathf.Sin(theta));
+            lineRenderer.SetPosition(i, pos);
+            theta += deltaTheta;
+        }
+    }
+
+    private void SetTarget(Vector3 location)
+    {
+        targetRenderer.SetPosition(0, transform.position);
+        targetRenderer.SetPosition(1, location);
+    }
+
     private void Seek(Vector3 location)
     {
         agent.SetDestination(location);
+        SetTarget(location);
     }
 
     private void Flee(Vector3 location)
     {
         agent.SetDestination(transform.position * 2 - location);
+        SetTarget(location);
     }
 
     private void Pursue()
@@ -181,24 +220,29 @@ public class Bot : MonoBehaviour
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        lineRenderer = GetComponent<LineRenderer>();
+        targetRenderer = GetComponentInChildren<LineRenderer>();
         targetDrive = target.GetComponent<Drive>();
 
         wanderTarget = Vector3.zero;
+        targetRenderer.positionCount = 2;
     }
-        
+
     private void Update()
     {
-        if (isOnCooldown)
-            return;
+        //if (isOnCooldown)
+        //    return;
 
-        if (!TargetInRange())
-            Wander();
-        else if (CanSeeTarget() && CanSeeMe())
-        {
-            CleverHide();
-            StartCoroutine(StartCooldown());
-        }
-        else
-            Pursue();
+        //if (!TargetInRange())
+        //    Wander();
+        //else if (CanSeeTarget() && CanSeeMe())
+        //{
+        //    CleverHide();
+        //    StartCoroutine(StartCooldown());
+        //}
+        //else
+        //    Pursue();
+
+        Wander();
     }
 }
