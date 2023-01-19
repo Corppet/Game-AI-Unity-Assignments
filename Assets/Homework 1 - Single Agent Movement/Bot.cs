@@ -12,12 +12,18 @@ public class Bot : MonoBehaviour
     [SerializeField] private float wanderJitter = 1f;
     private Vector3 wanderTarget;
 
+    [Space(5)]
+
+    [SerializeField] private float cooldownDuration = 5f;
+    [SerializeField] private float targetRange = 10f;
+
     [Space(10)]
     
     [SerializeField] private Transform target;
 
     private NavMeshAgent agent;
     private Drive targetDrive;
+    private bool isOnCooldown;
 
     private void Seek(Vector3 location)
     {
@@ -131,6 +137,47 @@ public class Bot : MonoBehaviour
         Seek(info.point + chosenDir.normalized * 5f);
     }
 
+    private IEnumerator StartCooldown()
+    {
+        isOnCooldown = true;
+
+        yield return new WaitForSeconds(cooldownDuration);
+
+        isOnCooldown = false;
+    }
+
+    private bool CanSeeTarget()
+    {
+        RaycastHit raycastInfo;
+        Vector3 targetDir = target.position - transform.position;
+
+        // check if the agent has line of sight of the target
+        float lookAngle = Vector3.Angle(transform.forward, targetDir);
+        if (Physics.Raycast(transform.position, targetDir, out raycastInfo)
+            && raycastInfo.collider.gameObject == target.gameObject && lookAngle < 60f)
+            return true;
+        else
+            return false;
+    }
+
+    private bool CanSeeMe()
+    {
+        Vector3 targetDir = transform.position - target.position;
+        float lookAngle = Vector3.Angle(target.forward, targetDir);
+        if (lookAngle < 60f)
+            return true;
+        else
+            return false;
+    }
+
+    private bool TargetInRange()
+    {
+        if (Vector3.Distance(transform.position, target.position) <= targetRange)
+            return true;
+        else
+            return false;
+    }
+    
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -138,33 +185,20 @@ public class Bot : MonoBehaviour
 
         wanderTarget = Vector3.zero;
     }
-    
-    private bool CanSeeTarget()
-    {
-        RaycastHit raycastInfo;
-        Vector3 targetDir = target.position - transform.position;
-
-        // check if the target is within the agent's field of view
-        if (Vector3.Angle(transform.forward, targetDir) > 45f)
-        {
-            return false;
-        }
-
-        // check if the agent has line of sight of the target
-        if (Physics.Raycast(transform.position, targetDir, out raycastInfo)
-            && raycastInfo.collider.gameObject == target.gameObject)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    
+        
     private void Update()
     {
-        if (CanSeeTarget())
+        if (isOnCooldown)
+            return;
+
+        if (!TargetInRange())
+            Wander();
+        else if (CanSeeTarget() && CanSeeMe())
+        {
             CleverHide();
+            StartCoroutine(StartCooldown());
+        }
+        else
+            Pursue();
     }
 }
