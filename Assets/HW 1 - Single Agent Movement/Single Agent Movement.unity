@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.43702182, g: 0.48471725, b: 0.5649799, a: 1}
+  m_IndirectSpecularColor: {r: 0.44777513, g: 0.49775326, b: 0.5754209, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -187,10 +187,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 788922667, guid: b79d0b13355dc8f44b7956db61a82656, type: 3}
+      propertyPath: m_Positions.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2069845566, guid: b79d0b13355dc8f44b7956db61a82656, type: 3}
       propertyPath: target
       value: 
       objectReference: {fileID: 406644339}
+    - target: {fileID: 2069845566, guid: b79d0b13355dc8f44b7956db61a82656, type: 3}
+      propertyPath: wanderJitter
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2069845568, guid: b79d0b13355dc8f44b7956db61a82656, type: 3}
       propertyPath: m_UseWorldSpace
       value: 1

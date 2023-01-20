@@ -9,7 +9,6 @@ public class Bot : MonoBehaviour
     [Header("Wander Movement")]
     [SerializeField] private float wanderRadius = 10f;
     [SerializeField] private float wanderDistance = 20f;
-    [SerializeField] private float wanderJitter = 1f;
     private Vector3 wanderTarget;
 
     [Space(5)]
@@ -32,7 +31,7 @@ public class Bot : MonoBehaviour
     private bool isOnCooldown;
 
     private LineRenderer lineRenderer;
-    private LineRenderer targetRenderer;
+    [SerializeField] private LineRenderer targetRenderer;
 
     /// <summary>
     /// Draw a circle around a given point.
@@ -51,27 +50,30 @@ public class Bot : MonoBehaviour
         for (int i = 0; i < circleSegments + 1; i++)
         {
             Vector3 pos = center + radius * new Vector3(Mathf.Cos(theta), 0f, Mathf.Sin(theta));
+            pos.y = 0f;
             lineRenderer.SetPosition(i, pos);
             theta += deltaTheta;
         }
     }
 
-    private void SetTarget(Vector3 location)
+    private void DrawTargetLine(Vector3 location)
     {
-        targetRenderer.SetPosition(0, transform.position);
-        targetRenderer.SetPosition(1, location);
+        Vector3 selfFlat = new Vector3(transform.position.x, 0f, transform.position.z);
+        targetRenderer.SetPosition(0, selfFlat);
+        Vector3 locFlat = new Vector3(location.x, 0f, location.z);
+        targetRenderer.SetPosition(1, locFlat);
     }
 
     private void Seek(Vector3 location)
     {
         agent.SetDestination(location);
-        SetTarget(location);
+        DrawTargetLine(location);
     }
 
     private void Flee(Vector3 location)
     {
         agent.SetDestination(transform.position * 2 - location);
-        SetTarget(location);
+        DrawTargetLine(location);
     }
 
     private void Pursue()
@@ -110,16 +112,38 @@ public class Bot : MonoBehaviour
 
     private void Wander()
     {
-        // find a random point in a circle around the target location
-        wanderTarget = new Vector3(Random.Range(-1f, 1f) * wanderJitter, 0, 
-            Random.Range(-1f, 1f) * wanderJitter);
-        wanderTarget.Normalize();
-        wanderTarget *= wanderRadius;
+        Debug.Log(Vector3.Distance(transform.position, wanderTarget));
+        
+        // if the wander target is not set, set it
+        if (wanderTarget == Vector3.zero)
+        {
+            // find a random point around a circle
+            float randomAngle = Random.Range(0f, 2f * Mathf.PI);
+            Vector3 randomPoint = new Vector3(Mathf.Cos(randomAngle), 0f, Mathf.Sin(randomAngle)) * wanderRadius;
 
-        Vector3 targetLocal = wanderTarget + new Vector3(0, 0, wanderDistance);
-        Vector3 targetWorld = transform.InverseTransformVector(targetLocal);
+            // offset the circle by the wander distance
+            Vector3 forward = transform.position + transform.forward * wanderDistance;
+            wanderTarget = randomPoint + forward;
 
-        Seek(targetWorld);
+            NavMeshHit hit;
+
+            if (NavMesh.SamplePosition(wanderTarget, out hit, wanderDistance, 1))
+            {
+                wanderTarget = hit.position;
+                DrawCircle(forward, wanderRadius);
+            }
+            else
+            {
+                wanderTarget = Vector3.zero;
+                lineRenderer.positionCount = 0;
+            }
+        }
+        // if the bot is close to the wander target, reset it
+        else if (Vector3.Distance(transform.position, wanderTarget) < 2.5f)
+            wanderTarget = Vector3.zero;
+        // if the wander target is set, seek it
+        else
+            Seek(wanderTarget);
     }
 
     private void Hide()
@@ -221,7 +245,6 @@ public class Bot : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         lineRenderer = GetComponent<LineRenderer>();
-        targetRenderer = GetComponentInChildren<LineRenderer>();
         targetDrive = target.GetComponent<Drive>();
 
         wanderTarget = Vector3.zero;
