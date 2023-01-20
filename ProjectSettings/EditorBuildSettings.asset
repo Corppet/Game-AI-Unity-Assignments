@@ -9,9 +9,9 @@ EditorBuildSettings:
     path: Assets/Main Menu/Main Menu.unity
     guid: 3a5d9f1ed8f85ac43b6114b9b89fffd9
   - enabled: 1
-    path: Assets/The Floor is Lava/The Floor is Lava.unity
+    path: Assets/HW 0 - Unity Basics/The Floor is Lava/The Floor is Lava.unity
     guid: 6f26e8b3c30b0d54690e5ef8ac22a897
   - enabled: 1
-    path: Assets/Challenge 1/Plane Programming.unity
+    path: Assets/HW 0 - Unity Basics/Challenge 1/Plane Programming.unity
     guid: b6cc3e14dbc3342c8ab192babf679766
   m_configObjects: {}
