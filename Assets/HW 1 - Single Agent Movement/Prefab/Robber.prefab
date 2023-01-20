@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 788922666}
   - component: {fileID: 788922667}
   m_Layer: 0
-  m_Name: Target Renderer
+  m_Name: Destination Renderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1655,7 +1655,7 @@ MonoBehaviour:
   targetRange: 10
   circleSegments: 36
   target: {fileID: 0}
-  targetRenderer: {fileID: 788922667}
+  destinationRenderer: {fileID: 788922667}
 --- !u!195 &2069845567
 NavMeshAgent:
   m_ObjectHideFlags: 0

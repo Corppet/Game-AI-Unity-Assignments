@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum BotBehavior
+{
+    Pursue,
+    Evade,
+    Wander,
+    PathFollow,
+    Mix
+}
+
 [RequireComponent(typeof(LineRenderer), typeof(NavMeshAgent))]
 public class Bot : MonoBehaviour
 {
@@ -25,24 +34,30 @@ public class Bot : MonoBehaviour
     [Space(10)]
     
     [SerializeField] private Transform target;
+    private Drive targetDrive;
+    private LineRenderer targetRenderer;
 
     private NavMeshAgent agent;
-    private Drive targetDrive;
     private bool isOnCooldown;
+    private float originalSpeed;
 
-    private LineRenderer lineRenderer;
-    [SerializeField] private LineRenderer targetRenderer;
+    private LineRenderer wanderRenderer;
+    [SerializeField] private LineRenderer destinationRenderer;
 
-    /// <summary>
-    /// Draw a circle around a given point.
-    /// </summary>
-    /// <param name="center"></param>
-    /// <param name="radius"></param>
+    private BotBehavior behavior;
+
+    public void SetBehavior(BotBehavior newBehavior)
+    {
+        behavior = newBehavior;
+        originalSpeed = agent.speed;
+        wanderRenderer.positionCount = 0;
+    }
+
     private void DrawCircle(Vector3 center, float radius)
     {
-        lineRenderer.positionCount = circleSegments + 1;
-        lineRenderer.startWidth = 0.1f;
-        lineRenderer.endWidth = 0.1f;
+        wanderRenderer.positionCount = circleSegments + 1;
+        wanderRenderer.startWidth = 0.1f;
+        wanderRenderer.endWidth = 0.1f;
 
         float deltaTheta = (2f * Mathf.PI) / circleSegments;
         float theta = 0f;
@@ -51,29 +66,47 @@ public class Bot : MonoBehaviour
         {
             Vector3 pos = center + radius * new Vector3(Mathf.Cos(theta), 0f, Mathf.Sin(theta));
             pos.y = 0f;
-            lineRenderer.SetPosition(i, pos);
+            wanderRenderer.SetPosition(i, pos);
             theta += deltaTheta;
         }
     }
 
-    private void DrawTargetLine(Vector3 location)
+    private void DrawDestinationLine(Vector3 location)
     {
         Vector3 selfFlat = new Vector3(transform.position.x, 0f, transform.position.z);
-        targetRenderer.SetPosition(0, selfFlat);
+        destinationRenderer.SetPosition(0, selfFlat);
         Vector3 locFlat = new Vector3(location.x, 0f, location.z);
-        targetRenderer.SetPosition(1, locFlat);
+        destinationRenderer.SetPosition(1, locFlat);
+    }
+
+    private void DrawTargetRange(float radius)
+    {
+        targetRenderer.positionCount = circleSegments + 1;
+        targetRenderer.startWidth = 0.1f;
+        targetRenderer.endWidth = 0.1f;
+
+        float deltaTheta = (2f * Mathf.PI) / circleSegments;
+        float theta = 0f;
+
+        for (int i = 0; i < circleSegments + 1; i++)
+        {
+            Vector3 pos = radius * new Vector3(Mathf.Cos(theta), 0f, Mathf.Sin(theta));
+            pos.y = 0f;
+            targetRenderer.SetPosition(i, pos);
+            theta += deltaTheta;
+        }
     }
 
     private void Seek(Vector3 location)
     {
         agent.SetDestination(location);
-        DrawTargetLine(location);
+        DrawDestinationLine(location);
     }
 
     private void Flee(Vector3 location)
     {
         agent.SetDestination(transform.position * 2 - location);
-        DrawTargetLine(location);
+        DrawDestinationLine(location);
     }
 
     private void Pursue()
@@ -89,25 +122,41 @@ public class Bot : MonoBehaviour
         ref float targetSpeed = ref targetDrive.currentSpeed;
         // target is behind the bot or is not moving
         if ((toTargetAngle > 90f && relativeHeading < 20f) || targetSpeed < 0.01f)
-        {
             Seek(target.position);
-            return;
-        }
         // target is in front of the bot and is moving
         else
         {
             float lookAhead = targetDirection.magnitude / (agent.speed + targetSpeed);
             Seek(target.position + target.forward * lookAhead);
         }
+
+        // slow down if the agent is close to the target
+        if (targetDirection.magnitude < targetRange)
+            agent.speed = originalSpeed * targetDirection.magnitude / targetRange;
+        else
+            agent.speed = originalSpeed;
     }
 
     private void Evade()
     {
-        // find the direction the target is looking at and flee from it
+        // find the direction the target is looking at and relative angles
+        // between the target and the bot
         Vector3 targetDirection = target.position - transform.position;
-        float lookAhead = targetDirection.magnitude / 
-            (agent.speed + targetDrive.currentSpeed);
-        Flee(target.position + target.forward * lookAhead);
+        float relativeHeading = Vector3.Angle(transform.forward,
+            transform.TransformVector(target.forward));
+        float toTargetAngle = Vector3.Angle(transform.forward,
+            transform.TransformVector(targetDirection));
+
+        ref float targetSpeed = ref targetDrive.currentSpeed;
+        // target is behind the bot or is not moving
+        if ((toTargetAngle > 90f && relativeHeading < 20f) || targetSpeed < 0.01f)
+            Flee(target.position);
+        // target is in front of the bot and is moving
+        else
+        {
+            float lookAhead = targetDirection.magnitude / (agent.speed + targetSpeed);
+            Flee(target.position + target.forward * lookAhead);
+        }
     }
 
     private void Wander()
@@ -135,7 +184,7 @@ public class Bot : MonoBehaviour
             else
             {
                 wanderTarget = Vector3.zero;
-                lineRenderer.positionCount = 0;
+                wanderRenderer.positionCount = 0;
             }
         }
         // if the bot is close to the wander target, reset it
@@ -200,6 +249,27 @@ public class Bot : MonoBehaviour
         Seek(info.point + chosenDir.normalized * 5f);
     }
 
+    private void PathFollow()
+    {
+        
+    }
+
+    private void Mix()
+    {
+        if (isOnCooldown)
+            return;
+
+        if (!TargetInRange())
+            Wander();
+        else if (CanSeeTarget() && CanSeeMe())
+        {
+            CleverHide();
+            StartCoroutine(StartCooldown());
+        }
+        else
+            Pursue();
+    }
+    
     private IEnumerator StartCooldown()
     {
         isOnCooldown = true;
@@ -244,28 +314,36 @@ public class Bot : MonoBehaviour
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        lineRenderer = GetComponent<LineRenderer>();
+        wanderRenderer = GetComponent<LineRenderer>();
         targetDrive = target.GetComponent<Drive>();
+        targetRenderer = target.GetComponent<LineRenderer>();
 
         wanderTarget = Vector3.zero;
-        targetRenderer.positionCount = 2;
+        destinationRenderer.positionCount = 2;
+        originalSpeed = agent.speed;
+
+        DrawTargetRange(targetRange);
     }
 
     private void Update()
     {
-        //if (isOnCooldown)
-        //    return;
-
-        //if (!TargetInRange())
-        //    Wander();
-        //else if (CanSeeTarget() && CanSeeMe())
-        //{
-        //    CleverHide();
-        //    StartCoroutine(StartCooldown());
-        //}
-        //else
-        //    Pursue();
-
-        Wander();
+        switch (behavior)
+        {
+            case BotBehavior.Pursue:
+                Pursue();
+                break;
+            case BotBehavior.Evade:
+                Evade();
+                break;
+            case BotBehavior.Wander:
+                Wander();
+                break;
+            case BotBehavior.PathFollow:
+                PathFollow();
+                break;
+            case BotBehavior.Mix:
+                Mix();
+                break;
+        }
     }
 }
