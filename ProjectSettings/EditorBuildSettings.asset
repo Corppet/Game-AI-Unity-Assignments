@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/HW 0 - Unity Basics/Challenge 1/Plane Programming.unity
     guid: b6cc3e14dbc3342c8ab192babf679766
+  - enabled: 1
+    path: Assets/HW 1 - Single Agent Movement/Single Agent Movement.unity
+    guid: de387feb2a36142bc804ee677d14b2ae
   m_configObjects: {}

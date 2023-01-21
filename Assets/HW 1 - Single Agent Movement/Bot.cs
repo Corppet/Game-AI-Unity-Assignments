@@ -2,19 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
+using TMPro;
 
 public enum BotBehavior
 {
     Pursue,
     Evade,
     Wander,
-    PathFollow,
+    FollowPath,
     Mix
 }
 
 [RequireComponent(typeof(LineRenderer), typeof(NavMeshAgent))]
 public class Bot : MonoBehaviour
 {
+    [Header("Pursue Movement")]
+    [SerializeField] private float targetRange = 10f;
+
+    [Space(5)]
+
     [Header("Wander Movement")]
     [SerializeField] private float wanderRadius = 10f;
     [SerializeField] private float wanderDistance = 20f;
@@ -22,14 +29,22 @@ public class Bot : MonoBehaviour
 
     [Space(5)]
 
+    [Header("Path Following Movement")]
+    [Tooltip("How many waypoints along the path to skip after reaching the current one.")]
+    [Range(1, 10)]
+    [SerializeField] private int pathIndexInterval = 1;
+    private int pathIndex;
+
+    [Space(5)]
+
+    [Header("Mixed Movement")]
     [SerializeField] private float cooldownDuration = 5f;
-    [SerializeField] private float targetRange = 10f;
 
     [Space(5)]
 
     [Header("Line Renderer")]
     [Range(10, 1000)]
-    [SerializeField] private int circleSegments = 100;
+    [SerializeField] private int circleSegments = 36;
 
     [Space(10)]
     
@@ -37,20 +52,43 @@ public class Bot : MonoBehaviour
     private Drive targetDrive;
     private LineRenderer targetRenderer;
 
+    [SerializeField] private GameObject pathObject;
+    private Vector3[] pathPoints;
+
     private NavMeshAgent agent;
     private bool isOnCooldown;
     private float originalSpeed;
+    [SerializeField] private TMP_Text speedText;
 
     private LineRenderer wanderRenderer;
     [SerializeField] private LineRenderer destinationRenderer;
 
+    [SerializeField] private GameObject behaviorOptions;
+    private Button[] behaviorButtons;
     private BotBehavior behavior;
 
-    public void SetBehavior(BotBehavior newBehavior)
+    public void SetBehavior(int newBehavior)
+    {
+        SetBehavior((BotBehavior)newBehavior);
+    }
+
+    private void SetBehavior(BotBehavior newBehavior)
     {
         behavior = newBehavior;
-        originalSpeed = agent.speed;
+        agent.speed = originalSpeed;
         wanderRenderer.positionCount = 0;
+        agent.autoBraking = true;
+
+        if (newBehavior == BotBehavior.FollowPath)
+            PathFollow(true);
+
+        for (int i = 0; i < behaviorButtons.Length; i++)
+        {
+            if (i != newBehavior.GetHashCode())
+                behaviorButtons[i].interactable = true;
+            else
+                behaviorButtons[i].interactable = false;
+        }
     }
 
     private void DrawCircle(Vector3 center, float radius)
@@ -249,9 +287,57 @@ public class Bot : MonoBehaviour
         Seek(info.point + chosenDir.normalized * 5f);
     }
 
-    private void PathFollow()
+    /// <summary>
+    /// Follows the given path.
+    /// </summary>
+    /// <param name="isFirstCall">
+    /// Set to true if this is the first time the function is called at the 
+    /// start of play or after switching to the "PathFollow" behavior.
+    /// </param>
+    private void PathFollow(bool isFirstCall = false)
     {
-        
+        if (isFirstCall)
+        {
+            // configure navmesh to follow path
+            agent.autoBraking = false;
+
+            int minIndex = 0;
+            Vector3 currentPoint = pathPoints[0];
+            currentPoint.y = 0f;
+            float minDistance = Vector3.Distance(transform.position, currentPoint);
+
+            // find the nearest point along the path
+            for (int i = 1; i < pathPoints.Length; i++)
+            {
+                currentPoint = pathPoints[i];
+                currentPoint.y = 0f;
+                float distance = Vector3.Distance(transform.position, currentPoint);
+                if (distance < minDistance)
+                {
+                    minIndex = i;
+                    minDistance = distance;
+                }
+            }
+
+            pathIndex = minIndex;
+        }
+
+        Vector3 waypointPos = pathPoints[pathIndex];
+        // we haven't reached the waypoint yet
+        if (Vector3.Distance(transform.position, waypointPos) > 2.5f)
+            Seek(waypointPos);
+        // we have reached to waypoint
+        else
+        {
+            // set the next waypoint
+            if (pathIndexInterval > 0)
+                pathIndex = Mathf.Min(pathPoints.Length - 1, pathIndex + pathIndexInterval);
+            else
+                pathIndex = Mathf.Max(0, pathIndex + pathIndexInterval);
+
+            if (pathIndex == pathPoints.Length - 1 || pathIndex == 0)
+                pathIndexInterval *= -1;
+        }
     }
 
     private void Mix()
@@ -321,8 +407,21 @@ public class Bot : MonoBehaviour
         wanderTarget = Vector3.zero;
         destinationRenderer.positionCount = 2;
         originalSpeed = agent.speed;
+        pathIndex = 0;
+
+        LineRenderer pathRenderer = pathObject.GetComponent<LineRenderer>();
+        // get the path points from the path object's line renderer
+        pathPoints = new Vector3[pathRenderer.positionCount];
+        pathRenderer.GetPositions(pathPoints);
+        for (int i = 0; i < pathPoints.Length; i++)
+            pathPoints[i].y = 0;
+        pathRenderer.SetPositions(pathPoints);
+
+        behaviorButtons = behaviorOptions.GetComponentsInChildren<Button>();
 
         DrawTargetRange(targetRange);
+
+        SetBehavior(BotBehavior.Pursue);
     }
 
     private void Update()
@@ -338,12 +437,14 @@ public class Bot : MonoBehaviour
             case BotBehavior.Wander:
                 Wander();
                 break;
-            case BotBehavior.PathFollow:
+            case BotBehavior.FollowPath:
                 PathFollow();
                 break;
             case BotBehavior.Mix:
                 Mix();
                 break;
         }
+        
+        speedText.text = "Speed: " + agent.velocity.magnitude.ToString("F2");
     }
 }

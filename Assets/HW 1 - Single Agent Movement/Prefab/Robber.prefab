@@ -1513,8 +1513,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7423567203501390115}
-  - component: {fileID: 2069845568}
   - component: {fileID: 2069845566}
+  - component: {fileID: 2069845568}
   - component: {fileID: 2069845567}
   m_Layer: 0
   m_Name: Robber
@@ -1540,6 +1540,27 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2069845566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7438494788967298231}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 819213c5d08efa24992f930a311fc1bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetRange: 10
+  wanderRadius: 10
+  wanderDistance: 10
+  pathIndexInterval: 1
+  cooldownDuration: 5
+  circleSegments: 36
+  target: {fileID: 0}
+  pathObject: {fileID: 0}
+  destinationRenderer: {fileID: 788922667}
 --- !u!120 &2069845568
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -1637,25 +1658,6 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 1
---- !u!114 &2069845566
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7438494788967298231}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 819213c5d08efa24992f930a311fc1bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wanderRadius: 10
-  wanderDistance: 10
-  cooldownDuration: 5
-  targetRange: 10
-  circleSegments: 36
-  target: {fileID: 0}
-  destinationRenderer: {fileID: 788922667}
 --- !u!195 &2069845567
 NavMeshAgent:
   m_ObjectHideFlags: 0

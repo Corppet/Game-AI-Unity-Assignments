@@ -18,7 +18,8 @@ public class MainMenuController : MonoBehaviour
         {
             GameObject button = Instantiate(buttonPrefab, content);
             button.GetComponentInChildren<TMP_Text>().text = scene;
-            button.GetComponent<Button>().onClick.AddListener(() => SceneManager.LoadScene(scene));
+            Button buttonComponent = button.GetComponent<Button>();
+            buttonComponent.onClick.AddListener(() => SceneManager.LoadScene(scene));
         }
     }
 }
