@@ -18,61 +18,61 @@ public enum BotBehavior
 public class Bot : MonoBehaviour
 {
     [Header("Pursue Movement")]
-    [SerializeField] private float targetRange = 10f;
+    [SerializeField] protected float targetRange = 10f;
 
     [Space(5)]
 
     [Header("Wander Movement")]
-    [SerializeField] private float wanderRadius = 10f;
-    [SerializeField] private float wanderDistance = 20f;
-    private Vector3 wanderTarget;
+    [SerializeField] protected float wanderRadius = 10f;
+    [SerializeField] protected float wanderDistance = 20f;
+    protected Vector3 wanderTarget;
 
     [Space(5)]
 
     [Header("Path Following Movement")]
     [Tooltip("How many waypoints along the path to skip after reaching the current one.")]
     [Range(1, 10)]
-    [SerializeField] private int pathIndexInterval = 1;
-    private int pathIndex;
+    [SerializeField] protected int pathIndexInterval = 1;
+    protected int pathIndex;
 
     [Space(5)]
 
     [Header("Mixed Movement")]
-    [SerializeField] private float cooldownDuration = 5f;
+    [SerializeField] protected float cooldownDuration = 5f;
 
     [Space(5)]
 
     [Header("Line Renderer")]
     [Range(10, 1000)]
-    [SerializeField] private int circleSegments = 36;
+    [SerializeField] protected int circleSegments = 36;
 
     [Space(10)]
     
-    [SerializeField] private Transform target;
-    private Drive targetDrive;
-    private LineRenderer targetRenderer;
+    [SerializeField] protected Transform target;
+    protected Drive targetDrive;
+    protected LineRenderer targetRenderer;
 
-    [SerializeField] private GameObject pathObject;
-    private Vector3[] pathPoints;
+    [SerializeField] protected GameObject pathObject;
+    protected Vector3[] pathPoints;
 
-    private NavMeshAgent agent;
-    private bool isOnCooldown;
-    private float originalSpeed;
-    [SerializeField] private TMP_Text speedText;
+    protected NavMeshAgent agent;
+    protected bool isOnCooldown;
+    protected float originalSpeed;
+    [SerializeField] protected TMP_Text speedText;
 
-    private LineRenderer wanderRenderer;
-    [SerializeField] private LineRenderer destinationRenderer;
+    protected LineRenderer wanderRenderer;
+    [SerializeField] protected LineRenderer destinationRenderer;
 
-    [SerializeField] private GameObject behaviorOptions;
-    private Button[] behaviorButtons;
-    private BotBehavior behavior;
+    [SerializeField] protected GameObject behaviorOptions;
+    protected Button[] behaviorButtons;
+    protected BotBehavior behavior;
 
     public void SetBehavior(int newBehavior)
     {
         SetBehavior((BotBehavior)newBehavior);
     }
 
-    private void SetBehavior(BotBehavior newBehavior)
+    protected void SetBehavior(BotBehavior newBehavior)
     {
         behavior = newBehavior;
         agent.speed = originalSpeed;
@@ -91,7 +91,7 @@ public class Bot : MonoBehaviour
         }
     }
 
-    private void DrawCircle(Vector3 center, float radius)
+    protected void DrawCircle(Vector3 center, float radius)
     {
         wanderRenderer.positionCount = circleSegments + 1;
         wanderRenderer.startWidth = 0.1f;
@@ -109,7 +109,7 @@ public class Bot : MonoBehaviour
         }
     }
 
-    private void DrawDestinationLine(Vector3 location)
+    protected void DrawDestinationLine(Vector3 location)
     {
         Vector3 selfFlat = new Vector3(transform.position.x, 0f, transform.position.z);
         destinationRenderer.SetPosition(0, selfFlat);
@@ -117,7 +117,7 @@ public class Bot : MonoBehaviour
         destinationRenderer.SetPosition(1, locFlat);
     }
 
-    private void DrawTargetRange(float radius)
+    protected void DrawTargetRange(float radius)
     {
         targetRenderer.positionCount = circleSegments + 1;
         targetRenderer.startWidth = 0.1f;
@@ -135,19 +135,19 @@ public class Bot : MonoBehaviour
         }
     }
 
-    private void Seek(Vector3 location)
+    protected void Seek(Vector3 location)
     {
         agent.SetDestination(location);
         DrawDestinationLine(location);
     }
 
-    private void Flee(Vector3 location)
+    protected void Flee(Vector3 location)
     {
         agent.SetDestination(transform.position * 2 - location);
         DrawDestinationLine(location);
     }
 
-    private void Pursue()
+    protected void Pursue()
     {
         // find the direction the target is looking at and relative angles
         // between the target and the bot
@@ -175,7 +175,7 @@ public class Bot : MonoBehaviour
             agent.speed = originalSpeed;
     }
 
-    private void Evade()
+    protected void Evade()
     {
         // find the direction the target is looking at and relative angles
         // between the target and the bot
@@ -197,7 +197,7 @@ public class Bot : MonoBehaviour
         }
     }
 
-    private void Wander()
+    protected void Wander()
     {
         Debug.Log(Vector3.Distance(transform.position, wanderTarget));
         
@@ -233,7 +233,7 @@ public class Bot : MonoBehaviour
             Seek(wanderTarget);
     }
 
-    private void Hide()
+    protected void Hide()
     {
         float dist = Mathf.Infinity;
         Vector3 chosenSpot = Vector3.zero;
@@ -254,7 +254,7 @@ public class Bot : MonoBehaviour
         Seek(chosenSpot);
     }
 
-    private void CleverHide()
+    protected void CleverHide()
     {
         float dist = Mathf.Infinity;
         Vector3 chosenSpot = Vector3.zero;
@@ -294,7 +294,7 @@ public class Bot : MonoBehaviour
     /// Set to true if this is the first time the function is called at the 
     /// start of play or after switching to the "PathFollow" behavior.
     /// </param>
-    private void PathFollow(bool isFirstCall = false)
+    protected void PathFollow(bool isFirstCall = false)
     {
         if (isFirstCall)
         {
@@ -340,7 +340,7 @@ public class Bot : MonoBehaviour
         }
     }
 
-    private void Mix()
+    protected void Mix()
     {
         if (isOnCooldown)
             return;
@@ -356,7 +356,7 @@ public class Bot : MonoBehaviour
             Pursue();
     }
     
-    private IEnumerator StartCooldown()
+    protected IEnumerator StartCooldown()
     {
         isOnCooldown = true;
 
@@ -365,7 +365,7 @@ public class Bot : MonoBehaviour
         isOnCooldown = false;
     }
 
-    private bool CanSeeTarget()
+    protected bool CanSeeTarget()
     {
         RaycastHit raycastInfo;
         Vector3 targetDir = target.position - transform.position;
@@ -379,7 +379,7 @@ public class Bot : MonoBehaviour
             return false;
     }
 
-    private bool CanSeeMe()
+    protected bool CanSeeMe()
     {
         Vector3 targetDir = transform.position - target.position;
         float lookAngle = Vector3.Angle(target.forward, targetDir);
@@ -389,7 +389,7 @@ public class Bot : MonoBehaviour
             return false;
     }
 
-    private bool TargetInRange()
+    protected bool TargetInRange()
     {
         if (Vector3.Distance(transform.position, target.position) <= targetRange)
             return true;
@@ -397,7 +397,7 @@ public class Bot : MonoBehaviour
             return false;
     }
     
-    private void Start()
+    protected void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         wanderRenderer = GetComponent<LineRenderer>();
@@ -424,7 +424,7 @@ public class Bot : MonoBehaviour
         SetBehavior(BotBehavior.Pursue);
     }
 
-    private void Update()
+    protected void Update()
     {
         switch (behavior)
         {
