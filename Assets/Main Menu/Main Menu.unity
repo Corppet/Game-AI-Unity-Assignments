@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -207,7 +207,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 951562245}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9999986
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -536,7 +536,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 10, y: 0.00067168026}
+  m_AnchoredPosition: {x: 10, y: 0.00007164478}
   m_SizeDelta: {x: -20, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &259958921
@@ -1043,6 +1043,7 @@ MonoBehaviour:
   - Plane Programming
   - Single Agent Movement
   - Obstacle Avoidance
+  - Flocking
   content: {fileID: 259958920}
   buttonPrefab: {fileID: 4015117879548970511, guid: 5ab7f95e7607a764b8bfc837c02792a3, type: 3}
 --- !u!4 &1722378662

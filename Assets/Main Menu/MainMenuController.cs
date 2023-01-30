@@ -21,5 +21,7 @@ public class MainMenuController : MonoBehaviour
             Button buttonComponent = button.GetComponent<Button>();
             buttonComponent.onClick.AddListener(() => SceneManager.LoadScene(scene));
         }
+
+        Cursor.visible = true;
     }
 }
