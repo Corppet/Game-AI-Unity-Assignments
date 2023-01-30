@@ -5,15 +5,17 @@ TagManager:
   serializedVersion: 2
   tags:
   - Platform
+  - Moving Obstacle
+  - Still Obstacle
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Obstacle
   - Water
   - UI
-  - 
-  - 
+  - Target
+  - Wall
   - 
   - 
   - 

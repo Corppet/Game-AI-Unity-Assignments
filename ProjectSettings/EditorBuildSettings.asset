@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/HW 1 - Single Agent Movement/Single Agent Movement.unity
     guid: de387feb2a36142bc804ee677d14b2ae
+  - enabled: 1
+    path: Assets/HW 2 - Obstacle Avoidance/Scenes/Obstacle Avoidance.unity
+    guid: e06b28f67005249bab20c2c196952ac1
   m_configObjects: {}

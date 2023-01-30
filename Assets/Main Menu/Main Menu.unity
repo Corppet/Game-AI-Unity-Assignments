@@ -207,7 +207,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 951562245}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.99997896
+  m_Size: 0.9999986
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -536,7 +536,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 10, y: 0.00008666519}
+  m_AnchoredPosition: {x: 10, y: 0.00067168026}
   m_SizeDelta: {x: -20, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &259958921
@@ -1042,6 +1042,7 @@ MonoBehaviour:
   - The Floor Is Lava
   - Plane Programming
   - Single Agent Movement
+  - Obstacle Avoidance
   content: {fileID: 259958920}
   buttonPrefab: {fileID: 4015117879548970511, guid: 5ab7f95e7607a764b8bfc837c02792a3, type: 3}
 --- !u!4 &1722378662
