@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using TMPro;
-using static UnityEngine.GraphicsBuffer;
 
 [RequireComponent(typeof(LineRenderer), typeof(NavMeshAgent))]
 public class ObstacleAvoidanceAgent : MonoBehaviour
