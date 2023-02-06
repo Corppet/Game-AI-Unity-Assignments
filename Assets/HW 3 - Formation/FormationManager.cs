@@ -3,11 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum FormationMode
+{
+    Scalable,
+    TwoLevel
+}
+
 public class FormationManager : MonoBehaviour
 {
     [HideInInspector] public static FormationManager instance { get; private set; }
 
-    [HideInInspector] public List<GameObject> agents;
+    [HideInInspector] public List<FormationAgent> agents;
+
+    public Transform formationLead;
+
+    [Space(5)]
 
     [Header("Formation Settings")]
     [Range(1, 100)]
@@ -15,12 +25,23 @@ public class FormationManager : MonoBehaviour
 
     [Space(5)]
 
+    [Header("Scalable Formation Settings")]
+    [Range(0f, 100f)]
+    public float radius = 10f;
+
+    [Space(5)]
+
+    [Header("Two-Level Formation Settings")]
+    [Range(0f, 180f)]
+    public float vFormationAngle = 30f;
+    [Range(0f, 180f)]
+    public float vFormationDistance = 1f;
+
+    [Space(10)]
+
+    [Header("References")]
     [SerializeField] private GameObject agentPrefab;
     [SerializeField] private Transform formationParent;
-
-    private NavMeshAgent agent;
-    private bool isOnCooldown;
-    private float originalSpeed;
 
     private void Awake()
     {
@@ -37,15 +58,32 @@ public class FormationManager : MonoBehaviour
     private void Start()
     {
         // setup agents in a V-shaped formation
-        agents = new List<GameObject>();
-        for (int i = 0; i < numAgents; i++)
+        agents = new List<FormationAgent>
+        {
+            // formation lead
+            Instantiate(agentPrefab, formationLead.position, Quaternion.identity, formationParent)
+                .GetComponent<FormationAgent>()
+        };
+        formationLead = agents[0].transform;
+        
+        // other agents
+        for (int i = 1; i < numAgents; i++)
         {
             Vector3 pos = transform.position + new Vector3(
-                Random.Range(-1f, 1f),
-                0f,
-                Random.Range(-1f, 1f));
+                Mathf.Sin(Mathf.Deg2Rad * vFormationAngle) * (i / 2) * vFormationDistance * Mathf.Pow(-1, i),
+                formationLead.position.y,
+                Mathf.Cos(Mathf.Deg2Rad * vFormationAngle) * (i / 2) * vFormationDistance);
 
-            agents.Add(Instantiate(agentPrefab, pos, Quaternion.identity, formationParent));
+            GameObject agent = Instantiate(agentPrefab, pos, Quaternion.identity, formationParent);
+            FormationAgent agentScript = agent.GetComponent<FormationAgent>();
+            agentScript.formationID = i;
+            agentScript.offset = pos;
+            agents.Add(agentScript);
         }
+    }
+
+    private void Update()
+    {
+        
     }
 }

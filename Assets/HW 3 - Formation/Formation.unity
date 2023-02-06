@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -192,6 +192,76 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
   m_PrefabInstance: {fileID: 29050371}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &95584600
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1226496025}
+    m_Modifications:
+    - target: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.41
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506739232213361588, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+      propertyPath: m_Name
+      value: Cube Obstacle (2)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+--- !u!4 &95584601 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5506739232213361587, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
+  m_PrefabInstance: {fileID: 95584600}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &128025785
 GameObject:
@@ -379,7 +449,7 @@ Transform:
   - {fileID: 242875998}
   - {fileID: 29050372}
   m_Father: {fileID: 1226496025}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &258525084
 PrefabInstance:
@@ -394,7 +464,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7983298222070999806, guid: 9f5e6d7fc7079754b984ddfb3b68dfa6, type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7983298222070999806, guid: 9f5e6d7fc7079754b984ddfb3b68dfa6, type: 3}
       propertyPath: m_LocalScale.x
@@ -1440,6 +1510,7 @@ Transform:
   - {fileID: 1906425500}
   - {fileID: 584788678}
   - {fileID: 4018860248115066934}
+  - {fileID: 95584601}
   - {fileID: 252243564}
   - {fileID: 258525085}
   m_Father: {fileID: 0}
@@ -1695,7 +1766,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 1322644435}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 1
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
