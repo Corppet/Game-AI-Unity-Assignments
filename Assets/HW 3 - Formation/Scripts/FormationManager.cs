@@ -15,7 +15,7 @@ public class FormationManager : MonoBehaviour
 
     [HideInInspector] public List<FormationAgent> agents;
 
-    public Transform formationLead;
+    public FormationLead formationLead;
     public FormationMode currentFormation;
 
     [Space(5)]
@@ -44,6 +44,16 @@ public class FormationManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private GameObject agentPrefab;
     [SerializeField] private Transform formationParent;
+
+    public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
+    {
+        return Quaternion.Euler(angles) * (point - pivot) + pivot;
+    }
+
+    public void ChangeFormation(FormationMode newMode)
+    {
+        currentFormation = newMode;
+    }
 
     private void Awake()
     {
@@ -91,16 +101,25 @@ public class FormationManager : MonoBehaviour
         {
             float angle = i * Mathf.PI * 2f / agents.Count;
             Vector3 newPos = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * currentRadius;
+            
             agents[i].formationDestination = newPos;
         }
     }
 
     private void TwoLevelFormation()
     {
+        Transform leadTransform = formationLead.transform;
+
         // move agents to form a v-shape behind the formation lead
         for (int i = 0; i < agents.Count; i++)
         {
-
+            Vector3 pos = new Vector3(Mathf.Sin(vFormationAngle * Mathf.Deg2Rad), 
+                leadTransform.position.y, 
+                Mathf.Cos(vFormationAngle * Mathf.Deg2Rad)) * vFormationDistance;
+            pos += leadTransform.position;
+            pos = RotatePointAroundPivot(pos, leadTransform.position, leadTransform.eulerAngles);
+            
+            agents[i].formationDestination = pos;
         }
     }
 }

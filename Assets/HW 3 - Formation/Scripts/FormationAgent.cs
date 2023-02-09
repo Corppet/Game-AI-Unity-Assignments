@@ -4,30 +4,26 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
-[RequireComponent(typeof(FieldOfView), typeof(NavMeshAgent))]
+[RequireComponent(typeof(Collider), typeof(FieldOfView), typeof(NavMeshAgent))]
 public class FormationAgent : MonoBehaviour
 {
     [HideInInspector] public int formationID;
     [HideInInspector] public Vector3 formationDestination;
+    [HideInInspector] public NavMeshAgent agent;
 
     [SerializeField] private LayerMask obstacleMask;
 
     private FieldOfView fov;
-    private NavMeshAgent agent;
-    private bool isOnCooldown;
-    private float originalSpeed;
 
     private void OnEnable()
     {
         fov = GetComponent<FieldOfView>();
         agent = GetComponent<NavMeshAgent>();
-        originalSpeed = agent.speed;
-        isOnCooldown = false;
     }
 
     private void FixedUpdate()
     {
-        
+        FollowFormation();
     }
 
     /// <summary>
@@ -35,18 +31,7 @@ public class FormationAgent : MonoBehaviour
     /// </summary>
     private void FollowFormation()
     {
-        Vector3 leadPos = FormationManager.instance.formationLead.position;
-    }
-
-    /// <summary>
-    /// Follows the player's invisible breadcrumb trail instead of the formation path.
-    /// </summary>
-    private void FollowTrail(bool isFirstCall = false)
-    {
-        if (isFirstCall)
-        {
-            
-        }
+        agent.SetDestination(formationDestination);
     }
     
     /// <summary>
@@ -72,5 +57,23 @@ public class FormationAgent : MonoBehaviour
 
         // no obstacle in agent's fielf of view
         return false;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            ref List<FormationAgent> agents = ref FormationManager.instance.agents;
+
+            // remove this agent from the manager agents and update ids
+            agents.RemoveAt(formationID);
+            for (int i = formationID; i < agents.Count; i++)
+            {
+                agents[i].formationID = i;
+            }
+
+            // destroy this agent
+            Destroy(gameObject);
+        }
     }
 }
