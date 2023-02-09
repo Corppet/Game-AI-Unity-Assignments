@@ -16,6 +16,7 @@ public class FormationManager : MonoBehaviour
     [HideInInspector] public List<FormationAgent> agents;
 
     public Transform formationLead;
+    public FormationMode currentFormation;
 
     [Space(5)]
 
@@ -27,7 +28,8 @@ public class FormationManager : MonoBehaviour
 
     [Header("Scalable Formation Settings")]
     [Range(0f, 100f)]
-    public float radius = 10f;
+    public float standardRadius = 10f;
+    [HideInInspector] public float currentRadius;
 
     [Space(5)]
 
@@ -53,37 +55,52 @@ public class FormationManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        currentRadius = standardRadius;
     }
 
     private void Start()
     {
-        // setup agents in a V-shaped formation
-        agents = new List<FormationAgent>
+        // create agents
+        for (int i = 0; i < numAgents; i++)
         {
-            // formation lead
-            Instantiate(agentPrefab, formationLead.position, Quaternion.identity, formationParent)
-                .GetComponent<FormationAgent>()
-        };
-        formationLead = agents[0].transform;
-        
-        // other agents
-        for (int i = 1; i < numAgents; i++)
-        {
-            Vector3 pos = transform.position + new Vector3(
-                Mathf.Sin(Mathf.Deg2Rad * vFormationAngle) * (i / 2) * vFormationDistance * Mathf.Pow(-1, i),
-                formationLead.position.y,
-                Mathf.Cos(Mathf.Deg2Rad * vFormationAngle) * (i / 2) * vFormationDistance);
-
-            GameObject agent = Instantiate(agentPrefab, pos, Quaternion.identity, formationParent);
-            FormationAgent agentScript = agent.GetComponent<FormationAgent>();
-            agentScript.formationID = i;
-            agentScript.offset = pos;
-            agents.Add(agentScript);
+            GameObject newAgent = Instantiate(agentPrefab, formationParent);
+            newAgent.name = "Agent " + i;
+            newAgent.GetComponent<FormationAgent>().formationID = i;
+            agents.Add(newAgent.GetComponent<FormationAgent>());
         }
     }
 
     private void Update()
     {
-        
+        switch (currentFormation)
+        {
+            case FormationMode.Scalable:
+                ScalableFormation();
+                break;
+            case FormationMode.TwoLevel:
+                TwoLevelFormation();
+                break;
+        }
+    }
+
+    private void ScalableFormation()
+    {
+        // move agents to form a circle around the formation lead
+        for (int i = 0; i < agents.Count; i++)
+        {
+            float angle = i * Mathf.PI * 2f / agents.Count;
+            Vector3 newPos = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * currentRadius;
+            agents[i].formationDestination = newPos;
+        }
+    }
+
+    private void TwoLevelFormation()
+    {
+        // move agents to form a v-shape behind the formation lead
+        for (int i = 0; i < agents.Count; i++)
+        {
+
+        }
     }
 }

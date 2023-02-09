@@ -8,7 +8,7 @@ using UnityEngine.AI;
 public class FormationAgent : MonoBehaviour
 {
     [HideInInspector] public int formationID;
-    [HideInInspector] public Vector3 offset;
+    [HideInInspector] public Vector3 formationDestination;
 
     [SerializeField] private LayerMask obstacleMask;
 
@@ -36,12 +36,6 @@ public class FormationAgent : MonoBehaviour
     private void FollowFormation()
     {
         Vector3 leadPos = FormationManager.instance.formationLead.position;
-
-        // rotate the offset around the current leadPos
-        Vector3 offsetRotated = Quaternion.Euler(0, FormationManager.instance.formationLead.eulerAngles.y, 0) * offset;
-
-        // set the agent's destination to the rotated offset
-        agent.SetDestination(leadPos + offsetRotated);
     }
 
     /// <summary>
