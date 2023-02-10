@@ -17,6 +17,7 @@ public class FormationManager : MonoBehaviour
 
     public FormationLead formationLead;
     public FormationMode currentFormation;
+    public LayerMask obstacleMask;
 
     [Space(5)]
 
@@ -28,8 +29,8 @@ public class FormationManager : MonoBehaviour
 
     [Header("Scalable Formation Settings")]
     [Range(0f, 100f)]
-    public float standardRadius = 10f;
-    [HideInInspector] public float currentRadius;
+    public float maxRadius = 5f;
+    [HideInInspector] public float radius;
 
     [Space(5)]
 
@@ -37,7 +38,7 @@ public class FormationManager : MonoBehaviour
     [Range(0f, 180f)]
     public float vFormationAngle = 30f;
     [Range(0f, 180f)]
-    public float vFormationDistance = 1f;
+    public float vFormationDistance = 2f;
 
     [Space(10)]
 
@@ -45,7 +46,8 @@ public class FormationManager : MonoBehaviour
     [SerializeField] private GameObject agentPrefab;
     [SerializeField] private Transform formationParent;
 
-    public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
+    public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, 
+        Vector3 angles)
     {
         return Quaternion.Euler(angles) * (point - pivot) + pivot;
     }
@@ -66,7 +68,7 @@ public class FormationManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        currentRadius = standardRadius;
+        radius = maxRadius;
     }
 
     private void Start()
@@ -100,7 +102,8 @@ public class FormationManager : MonoBehaviour
         for (int i = 0; i < agents.Count; i++)
         {
             float angle = i * Mathf.PI * 2f / agents.Count;
-            Vector3 newPos = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * currentRadius;
+            Vector3 newPos = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
+            newPos += formationLead.transform.position;
             
             agents[i].formationDestination = newPos;
         }
@@ -117,7 +120,8 @@ public class FormationManager : MonoBehaviour
                 leadTransform.position.y, 
                 Mathf.Cos(vFormationAngle * Mathf.Deg2Rad)) * vFormationDistance;
             pos += leadTransform.position;
-            pos = RotatePointAroundPivot(pos, leadTransform.position, leadTransform.eulerAngles);
+            pos = RotatePointAroundPivot(pos, leadTransform.position, 
+                leadTransform.eulerAngles);
             
             agents[i].formationDestination = pos;
         }

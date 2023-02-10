@@ -11,8 +11,6 @@ public class FormationAgent : MonoBehaviour
     [HideInInspector] public Vector3 formationDestination;
     [HideInInspector] public NavMeshAgent agent;
 
-    [SerializeField] private LayerMask obstacleMask;
-
     private FieldOfView fov;
 
     private void OnEnable()
@@ -21,7 +19,7 @@ public class FormationAgent : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         FollowFormation();
     }
@@ -31,19 +29,31 @@ public class FormationAgent : MonoBehaviour
     /// </summary>
     private void FollowFormation()
     {
-        agent.SetDestination(formationDestination);
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(formationDestination, out hit, agent.height * 2, 
+            NavMesh.AllAreas))
+        {
+            agent.SetDestination(hit.position);
+        }
+        else
+        {
+            Debug.Log("Agent " + formationID + " could not find a valid destination.");
+            agent.SetDestination(FormationManager.instance.formationLead.transform.position);
+        }
     }
     
     /// <summary>
-    /// Raycasts in front of the object to detect any obstacles in its way. If an obstacle is detected, the object will
-    /// follow the player's trail instead of following the formation path.
+    /// Raycasts in front of the object to detect any obstacles in its way. If an obstacle 
+    /// is detected, the object will follow the player's trail instead of following the 
+    /// formation path.
     /// </summary>
     private bool CheckForObstacles()
     {
         ref float range = ref fov.viewRadius;
 
         // find all obstacles within the agent's range
-        Collider[] obstaclesInRange = Physics.OverlapSphere(transform.position, range, obstacleMask);
+        Collider[] obstaclesInRange = Physics.OverlapSphere(transform.position, range, 
+            FormationManager.instance.obstacleMask);
 
         foreach (Collider collider in obstaclesInRange)
         {
