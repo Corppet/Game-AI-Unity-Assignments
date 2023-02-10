@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
+using TMPro;
 
 public enum FormationMode
 {
@@ -45,16 +47,38 @@ public class FormationManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private GameObject agentPrefab;
     [SerializeField] private Transform formationParent;
+    [SerializeField] private TMP_Dropdown formationDropdown;
+    [SerializeField] private Slider agentCountSlider;
+    [SerializeField] private TMP_Text agentCountText;
 
-    public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, 
+    public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot,
         Vector3 angles)
     {
         return Quaternion.Euler(angles) * (point - pivot) + pivot;
     }
 
+    /// <summary>
+    /// Function for changing formations when a new dropdown value is set.
+    /// </summary>
+    public void SetFormation()
+    {
+        ChangeFormation((FormationMode)formationDropdown.value);
+    }
+
     public void ChangeFormation(FormationMode newMode)
     {
         currentFormation = newMode;
+        SetupAgents();
+    }
+
+    /// <summary>
+    /// Function for changing the number of agents when a new slider value is set.
+    /// </summary>
+    public void SetNumAgents()
+    {
+        numAgents = (int)agentCountSlider.value;
+        agentCountText.text = "Agents: " + numAgents;
+        SetupAgents();
     }
 
     private void Awake()
@@ -73,14 +97,11 @@ public class FormationManager : MonoBehaviour
 
     private void Start()
     {
-        // create agents
-        for (int i = 0; i < numAgents; i++)
-        {
-            GameObject newAgent = Instantiate(agentPrefab, formationParent);
-            newAgent.name = "Agent " + i;
-            newAgent.GetComponent<FormationAgent>().formationID = i;
-            agents.Add(newAgent.GetComponent<FormationAgent>());
-        }
+        SetupDropdown();
+
+        agentCountSlider.value = numAgents;
+        agentCountText.text = "Agents: " + numAgents;
+        SetupAgents(true);
     }
 
     private void Update()
@@ -93,6 +114,44 @@ public class FormationManager : MonoBehaviour
             case FormationMode.TwoLevel:
                 TwoLevelFormation();
                 break;
+        }
+    }
+
+    private void SetupDropdown()
+    {
+        formationDropdown.ClearOptions();
+        List<string> options = new List<string>();
+        foreach (FormationMode mode in System.Enum.GetValues(typeof(FormationMode)))
+        {
+            options.Add(mode.ToString());
+        }
+        formationDropdown.AddOptions(options);
+        formationDropdown.value = (int)currentFormation;
+    }
+
+    private void SetupAgents(bool isFirstCall = false)
+    {
+        if (isFirstCall)
+        {
+            agents = new List<FormationAgent>();
+        }
+        else
+        {
+            foreach (FormationAgent agent in agents)
+            {
+                Destroy(agent.gameObject);
+            }
+            agents.Clear();
+        }
+
+        // create agents
+        for (int i = 0; i < numAgents; i++)
+        {
+            GameObject newAgent = Instantiate(agentPrefab, formationLead.transform.position, 
+                Quaternion.identity, formationParent);
+            newAgent.name = "Agent " + i;
+            newAgent.GetComponent<FormationAgent>().formationID = i;
+            agents.Add(newAgent.GetComponent<FormationAgent>());
         }
     }
 
@@ -116,9 +175,10 @@ public class FormationManager : MonoBehaviour
         // move agents to form a v-shape behind the formation lead
         for (int i = 0; i < agents.Count; i++)
         {
-            Vector3 pos = new Vector3(Mathf.Sin(vFormationAngle * Mathf.Deg2Rad), 
+            Vector3 pos = new Vector3(Mathf.Sin(vFormationAngle * Mathf.Deg2Rad) * vFormationDistance
+                * i / 2 * Mathf.Pow(-1, i), 
                 leadTransform.position.y, 
-                Mathf.Cos(vFormationAngle * Mathf.Deg2Rad)) * vFormationDistance;
+                Mathf.Cos(vFormationAngle * Mathf.Deg2Rad)) * vFormationDistance * i / 2;
             pos += leadTransform.position;
             pos = RotatePointAroundPivot(pos, leadTransform.position, 
                 leadTransform.eulerAngles);
