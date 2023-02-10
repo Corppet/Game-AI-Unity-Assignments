@@ -9,9 +9,10 @@ public class OAObstacle : MonoBehaviour
     
     private Material originalMaterial;
     private Renderer myRenderer;
+    private bool isDetected;
     
 
-    private void Awake()
+    private void OnEnable()
     {
         myRenderer = GetComponent<Renderer>();
         originalMaterial = myRenderer.material;
@@ -19,15 +20,20 @@ public class OAObstacle : MonoBehaviour
 
     public void Detected()
     {
+        if (isDetected)
+            return;
+
         StartCoroutine(ToggleDetected());
     }
 
     private IEnumerator ToggleDetected()
     {
+        isDetected = true;
         myRenderer.material = detectedMaterial;
 
         yield return new WaitForSeconds(detectedDuration);
 
+        isDetected = false;
         myRenderer.material = originalMaterial;
     }
 }

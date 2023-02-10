@@ -21,7 +21,33 @@ public class FormationAgent : MonoBehaviour
 
     private void Update()
     {
-        FollowFormation();
+        switch(FormationManager.instance.currentFormation)
+        {
+            case FormationMode.Scalable:
+                ScalableFormation();
+                break;
+            case FormationMode.TwoLevel:
+                TwoLevelFormation();
+                break;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            ref List<FormationAgent> agents = ref FormationManager.instance.agents;
+
+            // remove this agent from the manager agents and update ids
+            agents.RemoveAt(formationID);
+            for (int i = formationID; i < agents.Count; i++)
+            {
+                agents[i].formationID = i;
+            }
+
+            // destroy this agent
+            Destroy(gameObject);
+        }
     }
 
     /// <summary>
@@ -62,28 +88,24 @@ public class FormationAgent : MonoBehaviour
             // return true if obstacle is within the agent's field of view
             Vector3 direction = (obstacle.position - transform.position).normalized;
             if (Vector3.Angle(transform.forward, direction) <= fov.viewAngle / 2)
+            {
                 return true;
+            }
         }
 
         // no obstacle in agent's fielf of view
         return false;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void ScalableFormation()
     {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            ref List<FormationAgent> agents = ref FormationManager.instance.agents;
+        CheckForObstacles();
 
-            // remove this agent from the manager agents and update ids
-            agents.RemoveAt(formationID);
-            for (int i = formationID; i < agents.Count; i++)
-            {
-                agents[i].formationID = i;
-            }
+        FollowFormation();
+    }
 
-            // destroy this agent
-            Destroy(gameObject);
-        }
+    private void TwoLevelFormation()
+    {
+        FollowFormation();
     }
 }

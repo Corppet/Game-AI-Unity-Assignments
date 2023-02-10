@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7983298222070999806}
   - component: {fileID: 4130093314370570352}
   - component: {fileID: 57150075615545357}
-  - component: {fileID: 5970756497306940613}
+  - component: {fileID: 6471829244044660560}
   m_Layer: 3
   m_Name: Cylinder Obstacle
   m_TagString: Untagged
@@ -84,8 +84,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &5970756497306940613
-CapsuleCollider:
+--- !u!64 &6471829244044660560
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -94,7 +94,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}

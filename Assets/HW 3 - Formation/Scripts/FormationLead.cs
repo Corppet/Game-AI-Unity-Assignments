@@ -103,7 +103,7 @@ public class FormationLead : MonoBehaviour
 
     private void TwoLevelFormation()
     {
-        FollowPath();
+        //FollowPath();
     }
 
     /// <summary>

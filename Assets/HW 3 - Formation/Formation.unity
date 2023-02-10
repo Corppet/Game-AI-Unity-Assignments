@@ -641,7 +641,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 5970756497306940613, guid: 9f5e6d7fc7079754b984ddfb3b68dfa6, type: 3}
+    - {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 9f5e6d7fc7079754b984ddfb3b68dfa6, type: 3}
 --- !u!4 &258525085 stripped
 Transform:
@@ -1222,7 +1222,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agents: []
   formationLead: {fileID: 1532857705}
-  currentFormation: 0
+  currentFormation: 1
   obstacleMask:
     serializedVersion: 2
     m_Bits: 8
@@ -1599,11 +1599,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 849312817}
   m_CullTransparentMesh: 1
---- !u!1 &965389764 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5615497815162033314, guid: 9f5e6d7fc7079754b984ddfb3b68dfa6, type: 3}
-  m_PrefabInstance: {fileID: 4018860248115066933}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1002707245
 GameObject:
   m_ObjectHideFlags: 0
@@ -2417,7 +2412,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1493918102}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.67, y: 1.110625, z: 1.8}
+  m_LocalPosition: {x: -26.31, y: 1.110625, z: -14.68}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2526,7 +2521,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: fef7fa0161adcc243bbdcd6ac9d9bff4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3371,25 +3366,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1674119236}
   m_CullTransparentMesh: 1
---- !u!1 &1750898206 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5615497815162033314, guid: 9f5e6d7fc7079754b984ddfb3b68dfa6, type: 3}
-  m_PrefabInstance: {fileID: 258525084}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &1750898210
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1750898206}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1879474399
 GameObject:
   m_ObjectHideFlags: 0
@@ -3916,7 +3892,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7983298222070999806, guid: 9f5e6d7fc7079754b984ddfb3b68dfa6, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7983298222070999806, guid: 9f5e6d7fc7079754b984ddfb3b68dfa6, type: 3}
       propertyPath: m_LocalScale.z
@@ -3967,27 +3943,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 5970756497306940613, guid: 9f5e6d7fc7079754b984ddfb3b68dfa6, type: 3}
+    - {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 9f5e6d7fc7079754b984ddfb3b68dfa6, type: 3}
 --- !u!4 &4018860248115066934 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7983298222070999806, guid: 9f5e6d7fc7079754b984ddfb3b68dfa6, type: 3}
   m_PrefabInstance: {fileID: 4018860248115066933}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &4018860248115066938
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 965389764}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &5506739231418572079
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4055,5 +4017,6 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 8
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 1d6b47d83c1848b479ac1ed118ab897e, type: 3}
