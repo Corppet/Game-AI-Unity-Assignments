@@ -175,10 +175,10 @@ public class FormationManager : MonoBehaviour
         // move agents to form a v-shape behind the formation lead
         for (int i = 0; i < agents.Count; i++)
         {
-            Vector3 pos = new Vector3(Mathf.Cos(vFormationAngle * Mathf.Deg2Rad) * vFormationDistance
-                * (i / 2 + 1) * Mathf.Pow(-1, i), 
+            Vector3 pos = new Vector3(Mathf.Sin((90f - vFormationAngle) * Mathf.Deg2Rad) * vFormationDistance
+                * (i / 2) * Mathf.Pow(-1, i), 
                 leadTransform.position.y, 
-                -Mathf.Sin(vFormationAngle * Mathf.Deg2Rad)) * vFormationDistance * (i / 2 + 1);
+                -Mathf.Cos((90f - vFormationAngle) * Mathf.Deg2Rad)) * vFormationDistance * (i / 2);
             pos += leadTransform.position;
             pos = RotatePointAroundPivot(pos, leadTransform.position, 
                 leadTransform.eulerAngles);

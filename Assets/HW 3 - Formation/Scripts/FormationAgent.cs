@@ -66,6 +66,8 @@ public class FormationAgent : MonoBehaviour
             Debug.Log("Agent " + formationID + " could not find a valid destination.");
             agent.SetDestination(FormationManager.instance.formationLead.transform.position);
         }
+
+        Debug.Log("Agent " + formationID + ": " + agent.destination);
     }
     
     /// <summary>
