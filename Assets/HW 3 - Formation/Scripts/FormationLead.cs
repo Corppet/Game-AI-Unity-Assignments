@@ -64,35 +64,38 @@ public class FormationLead : MonoBehaviour
         }
         else if (followMode == FormationMode.TwoLevel)
         {
+            ref float maxSpeed = ref FormationManager.instance.maxSpeed;
+
             // get the average velocity and destination distance of all the agents
             float averageSpeed = 0;
-            float averageDistance = 0;
             foreach (FormationAgent agent in FormationManager.instance.agents)
             {
                 // if the agent's destination is not viable, ignore
                 if (!agent.CanReachDestination())
                 {
+                    averageSpeed += maxSpeed;
                     continue;
                 }
 
-                averageSpeed += agent.agent.velocity.magnitude;
-                averageDistance += Vector3.Distance(agent.transform.position,
+                float distance = Vector3.Distance(agent.transform.position,
                        agent.formationDestination);
+                float currentSpeed = agent.agent.velocity.magnitude;
+
+                if (distance < 1.5f)
+                {
+                    averageSpeed += maxSpeed;
+                }
+                else
+                {
+                    //averageSpeed += Mathf.Clamp(currentSpeed, 0f, maxSpeed * .5f);
+                    //averageSpeed -= currentSpeed * distance;
+                    averageSpeed += currentSpeed / distance;
+                }
             }
             averageSpeed /= FormationManager.instance.agents.Count;
-            averageDistance /= FormationManager.instance.agents.Count;
-
-            float newSpeed = averageSpeed * .6f;
-            if (averageDistance > 1f)
-            {
-                newSpeed /= averageDistance;
-            }
-            newSpeed = Mathf.Max(newSpeed, 2f);
-            leadRigidbody.velocity = direction * newSpeed;
+            averageSpeed = Mathf.Clamp(averageSpeed, 0f, maxSpeed * .75f);
+            leadRigidbody.velocity = direction * averageSpeed;
         }
-
-        Debug.Log(leadRigidbody.velocity.magnitude);
-        Debug.DrawLine(transform.position, targetPosition, Color.red);
 
         if (Vector3.Distance(transform.position, targetPosition) < .2f)
         {
@@ -102,7 +105,7 @@ public class FormationLead : MonoBehaviour
 
     private void ScalableFormation()
     {
-        fov.enabled = true;
+        fov.SetActive(true);
 
         // shrink the formation radius if an obstacle is found
         fov.viewRadius = FormationManager.instance.radius * 1.5f;
@@ -124,12 +127,12 @@ public class FormationLead : MonoBehaviour
 
     private void TwoLevelFormation()
     {
-        fov.enabled = false;
+        fov.SetActive(false);
         FollowPath(FormationMode.TwoLevel);
     }
 
     /// <summary>
-    /// Raycasts in front of the object to detect any obstacles in its way. If an obstacle 
+    /// Cone-checks in front of the object to detect any obstacles in its way. If an obstacle 
     /// is detected, the object will follow the player's trail instead of following the 
     /// formation path.
     /// </summary>

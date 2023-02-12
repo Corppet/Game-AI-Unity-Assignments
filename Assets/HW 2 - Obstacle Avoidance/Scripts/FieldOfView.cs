@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 /*
  * Original Field-of-View Visualizer by Sebastion Lague
@@ -27,7 +28,12 @@ public class FieldOfView : MonoBehaviour
     [SerializeField] private MeshFilter viewMeshFilter;
     private Mesh viewMesh;
 
-    void Start()
+    public void SetActive(bool isActive)
+    {
+        viewMeshFilter.gameObject.SetActive(isActive);
+    }
+
+    private void Start()
     {
         viewMesh = new Mesh();
         viewMesh.name = "View Mesh";

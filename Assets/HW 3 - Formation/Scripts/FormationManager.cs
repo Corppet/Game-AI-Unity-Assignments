@@ -26,6 +26,8 @@ public class FormationManager : MonoBehaviour
     [Header("Formation Settings")]
     [Range(12, 20)]
     public int numAgents = 12;
+    [Range(0f, 20f)]
+    public float maxSpeed = 5f;
 
     [Space(5)]
 

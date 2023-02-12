@@ -209,6 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 933e93d8fe085fc45a3df7111c61a87c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  avoidDistance: 2
   formationID: 0
   formationDestination: {x: 0, y: 0, z: 0}
   agent: {fileID: 0}
