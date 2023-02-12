@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(FieldOfView), typeof(Rigidbody))]
 public class FormationLead : MonoBehaviour
@@ -43,7 +44,7 @@ public class FormationLead : MonoBehaviour
         }
     }
 
-    private void FollowPath()
+    private void FollowPath(FormationMode followMode)
     {
         if (pathIndex >= pathRenderer.positionCount)
         {
@@ -55,24 +56,42 @@ public class FormationLead : MonoBehaviour
         direction.Normalize();
 
         // change the lead's rotation to face the next point in the path
-        //transform.rotation = Quaternion.LookRotation(direction);
         transform.LookAt(targetPosition);
 
-        // set the lead's velocity to the average velocity of the agents
-        float averageVelocity = 0f;
-        foreach (FormationAgent agent in FormationManager.instance.agents)
+        if (followMode == FormationMode.Scalable)
         {
-            // get the velocity in the lead's direction
-            float agentVelocity = agent.agent.velocity.magnitude;
-            if (agentVelocity == 0f)
-            {
-                agentVelocity = agent.agent.speed;
-            }
-            averageVelocity += agentVelocity;
+            leadRigidbody.velocity = direction * 3f;
         }
-        averageVelocity /= FormationManager.instance.agents.Count;
-        leadRigidbody.velocity = direction * 3f;
+        else if (followMode == FormationMode.TwoLevel)
+        {
+            // get the average velocity and destination distance of all the agents
+            float averageSpeed = 0;
+            float averageDistance = 0;
+            foreach (FormationAgent agent in FormationManager.instance.agents)
+            {
+                // if the agent's destination is not viable, ignore
+                if (!agent.CanReachDestination())
+                {
+                    continue;
+                }
 
+                averageSpeed += agent.agent.velocity.magnitude;
+                averageDistance += Vector3.Distance(agent.transform.position,
+                       agent.formationDestination);
+            }
+            averageSpeed /= FormationManager.instance.agents.Count;
+            averageDistance /= FormationManager.instance.agents.Count;
+
+            float newSpeed = averageSpeed * .6f;
+            if (averageDistance > 1f)
+            {
+                newSpeed /= averageDistance;
+            }
+            newSpeed = Mathf.Max(newSpeed, 2f);
+            leadRigidbody.velocity = direction * newSpeed;
+        }
+
+        Debug.Log(leadRigidbody.velocity.magnitude);
         Debug.DrawLine(transform.position, targetPosition, Color.red);
 
         if (Vector3.Distance(transform.position, targetPosition) < .2f)
@@ -83,6 +102,8 @@ public class FormationLead : MonoBehaviour
 
     private void ScalableFormation()
     {
+        fov.enabled = true;
+
         // shrink the formation radius if an obstacle is found
         fov.viewRadius = FormationManager.instance.radius * 1.5f;
         if (CheckForObstacles())
@@ -97,13 +118,14 @@ public class FormationLead : MonoBehaviour
                 FormationManager.instance.radius + .1f, 
                 FormationManager.instance.maxRadius * 1.5f);
         }
-
-        FollowPath();
+        
+        FollowPath(FormationMode.Scalable);
     }
 
     private void TwoLevelFormation()
     {
-        //FollowPath();
+        fov.enabled = false;
+        FollowPath(FormationMode.TwoLevel);
     }
 
     /// <summary>

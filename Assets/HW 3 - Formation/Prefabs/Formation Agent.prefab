@@ -150,7 +150,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ffaf20d328f4d724996eac14f348e81a, type: 2}
+  - {fileID: 2100000, guid: ed159779b00ac8f4690c073121d25902, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -212,9 +212,6 @@ MonoBehaviour:
   formationID: 0
   formationDestination: {x: 0, y: 0, z: 0}
   agent: {fileID: 0}
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 8
 --- !u!195 &9088652658691311136
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -229,9 +226,9 @@ NavMeshAgent:
   m_Acceleration: 10
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 2
+  m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 0
+  m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 2
   m_BaseOffset: 1

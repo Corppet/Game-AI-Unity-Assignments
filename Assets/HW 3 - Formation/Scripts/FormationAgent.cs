@@ -13,6 +13,13 @@ public class FormationAgent : MonoBehaviour
 
     private FieldOfView fov;
 
+    public bool CanReachDestination()
+    {
+        NavMeshPath path = new NavMeshPath();
+        agent.CalculatePath(formationDestination, path);
+        return path.status == NavMeshPathStatus.PathComplete;
+    }
+
     private void OnEnable()
     {
         fov = GetComponent<FieldOfView>();
@@ -56,18 +63,15 @@ public class FormationAgent : MonoBehaviour
     private void FollowFormation()
     {
         NavMeshHit hit;
-        if (NavMesh.SamplePosition(formationDestination, out hit, agent.height * 2, 
-            NavMesh.AllAreas))
+        if (CanReachDestination())
         {
-            agent.SetDestination(hit.position);
+            agent.SetDestination(formationDestination);
         }
         else
         {
-            Debug.Log("Agent " + formationID + " could not find a valid destination.");
+            Debug.Log("Agent " + formationID + " could not reach destination.");
             agent.SetDestination(FormationManager.instance.formationLead.transform.position);
         }
-
-        Debug.Log("Agent " + formationID + ": " + agent.destination);
     }
     
     /// <summary>

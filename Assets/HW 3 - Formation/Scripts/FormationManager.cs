@@ -24,23 +24,25 @@ public class FormationManager : MonoBehaviour
     [Space(5)]
 
     [Header("Formation Settings")]
-    [Range(1, 100)]
+    [Range(12, 20)]
     public int numAgents = 12;
 
     [Space(5)]
 
     [Header("Scalable Formation Settings")]
-    [Range(0f, 100f)]
+    [Range(0f, 10f)]
     public float maxRadius = 5f;
     [HideInInspector] public float radius;
 
     [Space(5)]
 
     [Header("Two-Level Formation Settings")]
-    [Range(0f, 180f)]
-    public float vFormationAngle = 30f;
-    [Range(0f, 180f)]
-    public float vFormationDistance = 2f;
+    [Range(0f, 10f)]
+    [Tooltip("The orthogonal distance between each agent in the grid formation.")]
+    public float gapDistance = 5f;
+    [Range(1, 5)]
+    [Tooltip("The number of agents in a single row of the grid formation (number of columns).")]
+    public int rowWidth = 4;
 
     [Space(10)]
 
@@ -93,6 +95,7 @@ public class FormationManager : MonoBehaviour
         }
 
         radius = maxRadius;
+        agents = new List<FormationAgent>();
     }
 
     private void Start()
@@ -101,7 +104,6 @@ public class FormationManager : MonoBehaviour
 
         agentCountSlider.value = numAgents;
         agentCountText.text = "Agents: " + numAgents;
-        SetupAgents(true);
     }
 
     private void Update()
@@ -129,20 +131,13 @@ public class FormationManager : MonoBehaviour
         formationDropdown.value = (int)currentFormation;
     }
 
-    private void SetupAgents(bool isFirstCall = false)
+    private void SetupAgents()
     {
-        if (isFirstCall)
+        foreach (FormationAgent agent in agents)
         {
-            agents = new List<FormationAgent>();
+            Destroy(agent.gameObject);
         }
-        else
-        {
-            foreach (FormationAgent agent in agents)
-            {
-                Destroy(agent.gameObject);
-            }
-            agents.Clear();
-        }
+        agents.Clear();
 
         // create agents
         for (int i = 0; i < numAgents; i++)
@@ -171,19 +166,51 @@ public class FormationManager : MonoBehaviour
     private void TwoLevelFormation()
     {
         Transform leadTransform = formationLead.transform;
+        int numRows = Mathf.CeilToInt((float)agents.Count / rowWidth);
 
-        // move agents to form a v-shape behind the formation lead
+        // move agents to form a grid on the formation lead
         for (int i = 0; i < agents.Count; i++)
         {
-            Vector3 pos = new Vector3(Mathf.Sin((90f - vFormationAngle) * Mathf.Deg2Rad) * vFormationDistance
-                * (i / 2) * Mathf.Pow(-1, i), 
-                leadTransform.position.y, 
-                -Mathf.Cos((90f - vFormationAngle) * Mathf.Deg2Rad)) * vFormationDistance * (i / 2);
-            pos += leadTransform.position;
-            pos = RotatePointAroundPivot(pos, leadTransform.position, 
-                leadTransform.eulerAngles);
-            
-            agents[i].formationDestination = pos;
+            int row = i / rowWidth;
+            int col = i % rowWidth;
+
+            Vector3 newPos = leadTransform.position;
+
+            // first half of rows are in front of the lead
+            if (row < numRows / 2)
+            {
+                newPos += Vector3.forward * gapDistance * (numRows / 2 - row);
+            }
+            // second half of rows are behind the lead
+            else
+            {
+                newPos += Vector3.back * gapDistance * (row - numRows / 2);
+            }
+
+            // if the number of rows is even, offset the rows by half a gap
+            if (numRows % 2 == 0)
+            {
+                newPos += Vector3.back * gapDistance / 2;
+            }
+
+            // first half of columns are to the left of the lead
+            if (col < rowWidth / 2)
+            {
+                newPos += Vector3.left * gapDistance * (rowWidth / 2 - col);
+            }
+            // second half of columns are to the right of the lead
+            else
+            {
+                newPos += Vector3.right * gapDistance * (col - rowWidth / 2);
+            }
+
+            // if the number of columns is even, offset the rows by half a gap
+            if (rowWidth % 2 == 0)
+            {
+                newPos += Vector3.right * gapDistance / 2;
+            }
+
+            agents[i].formationDestination = newPos;
         }
     }
 }
