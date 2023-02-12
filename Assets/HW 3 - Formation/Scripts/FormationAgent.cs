@@ -129,6 +129,7 @@ public class FormationAgent : MonoBehaviour
             }
             else
             {
+                // avoid wall
                 Vector3 reflectVec = Vector3.Reflect(hitFront.point - pos, hitFront.normal)
                     .normalized * avoidDistance;
                 agent.SetDestination(reflectVec);
