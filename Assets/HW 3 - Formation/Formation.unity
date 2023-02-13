@@ -1222,7 +1222,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agents: []
   formationLead: {fileID: 1532857705}
-  currentFormation: 1
+  currentFormation: 0
   obstacleMask:
     serializedVersion: 2
     m_Bits: 8

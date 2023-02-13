@@ -104,6 +104,7 @@ public class FormationManager : MonoBehaviour
     {
         SetupDropdown();
 
+        SetupAgents();
         agentCountSlider.value = numAgents;
         agentCountText.text = "Agents: " + numAgents;
     }
