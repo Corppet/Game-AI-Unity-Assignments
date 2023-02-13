@@ -26,4 +26,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/HW 3 - Formation/Formation.unity
     guid: 0044a618b7e8dcf499ec77b3b38c5681
+  - enabled: 1
+    path: Assets/LE - NavMesh/NavMesh.unity
+    guid: d027fe1a77511c544ad7d118a03fcb22
   m_configObjects: {}
