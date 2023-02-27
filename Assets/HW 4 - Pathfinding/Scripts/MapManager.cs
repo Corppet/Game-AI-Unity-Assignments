@@ -11,14 +11,16 @@ namespace Pathfinding
     {
         [HideInInspector] public static MapManager instance { get; private set; }
 
+        [HideInInspector] public MapData mapData;
+        [HideInInspector] public List<Node> nodes;
+
         [SerializeField] private TextAsset[] mapFiles;
         [SerializeField] private MapTiles mapTiles;
+        [SerializeField] private GraphSettings graphSettings;
 
         [Space(5)]
 
         [SerializeField] private float playerOffset = 2f;
-
-        private MapData mapData;
 
         public void ProcessMapFile(TextAsset file)
         {
@@ -113,6 +115,13 @@ namespace Pathfinding
                 Destroy(child.gameObject);
             }
 
+            // clear the graph
+            foreach (Node node in nodes)
+            {
+                Destroy(node.gameObject);
+                nodes.Clear();
+            }
+
             // load the map data
             for (int z = 0; z < mapData.height; z++)
             {
@@ -166,6 +175,7 @@ namespace Pathfinding
 
             // update the navmesh
             mapTiles.groundSurface.BuildNavMesh();
+            BuildGraph();
             GameManager.instance.ResetPlayer();
         }
 
@@ -179,6 +189,8 @@ namespace Pathfinding
             {
                 Destroy(gameObject);
             }
+
+            nodes = new List<Node>();
         }
 
         private void Start()
@@ -191,6 +203,78 @@ namespace Pathfinding
             else
             {
                 Debug.LogError("No map files found");
+            }
+        }
+
+        private bool isInBounds(int x, int z)
+        {
+            return x >= 0 && x < mapData.width && z >= 0 && z < mapData.height;
+        }
+
+        private bool isWalkable(int x, int z)
+        {
+            return mapData.data[z][x] == '.';
+        }
+
+        private void BuildGraph()
+        {
+            // instantiate a node at every corner of the graph
+            for (int z = 0; z < mapData.height; z++)
+            {
+                for (int x = 0; x < mapData.width; x++)
+                {
+                    // ignore if not ground
+                    if (mapData.data[z][x] != '.')
+                        continue;
+
+                    // check for diagonally adjacent obstacle
+                    bool hasDiagAdj = false;
+                    for (int i = -1; i <= 1; i += 2)
+                    {
+                        for (int j = -1; j <= 1; j += 2)
+                        {
+                            if (isInBounds(x + i, z + j) && !isWalkable(x + i, z + j))
+                            {
+                                hasDiagAdj = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // check for orthogonally adjacent obstacle
+                    bool hasOrthAdj = false;
+                    for (int i = -1; i <= 1; i += 2)
+                    {
+                        if (isInBounds(x, z + i) && !isWalkable(x, z + i))
+                        {
+                            hasOrthAdj = true;
+                            break;
+                        }
+                        if (isInBounds(x + i, z) && !isWalkable(x + i, z))
+                        {
+                            hasOrthAdj = true;
+                            break;
+                        }
+                    }
+
+                    // the tile is a corner if there is diagonally-adjacent but not orthogonally-adjacent obstacles
+                    if (hasDiagAdj && !hasOrthAdj) 
+                    {
+                        Tilemap ground = mapTiles.groundMap;
+                        Vector3 nodePos = new Vector3(
+                            ground.tileAnchor.x + x, 
+                            mapTiles.cellSize.y + ground.tileAnchor.y + graphSettings.offsetFromGround,
+                            ground.tileAnchor.z + z);
+                        GameObject node = Instantiate(graphSettings.nodePrefab, nodePos, Quaternion.identity, graphSettings.parent);
+                        nodes.Add(node.GetComponent<Node>());
+                    }
+                }
+            }
+
+            // build edges
+            foreach (Node node in nodes)
+            {
+                node.FindNeighbors();
             }
         }
     }
@@ -219,5 +303,18 @@ namespace Pathfinding
         public int height;
         public int width;
         public List<string> data;
+    }
+
+    [System.Serializable]
+    public struct GraphSettings
+    {
+        [Tooltip("The offset of the node from the ground.")]
+        public float offsetFromGround;
+
+        [Space(5)]
+
+        public GameObject nodePrefab;
+        public LineRenderer pathRenderer;
+        public Transform parent;
     }
 }
