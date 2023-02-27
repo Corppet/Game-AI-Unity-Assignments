@@ -6,9 +6,20 @@ using UnityEngine.AI;
 
 namespace Pathfinding
 {
+    public enum HeuristicType
+    {
+        Distance,
+        ManhattanDistance
+    }
+
     [RequireComponent(typeof(NavMeshAgent))]
     public class PlayerController : MonoBehaviour
     {
+        [HideInInspector] public HeuristicType heuristic;
+
+        [Range(0f, 1f)]
+        public float heuristicWeight;
+
         [SerializeField] private GameObject cursorTargetPrefab;
         [SerializeField] private GameObject targetPrefab;
         [SerializeField] private Color reachableColor;
@@ -26,6 +37,8 @@ namespace Pathfinding
         private bool isReachable;
 
         private GameObject target;
+        private List<Vector3> targetPath;
+        private int pathIndex;
 
         private void Awake()
         {
@@ -86,12 +99,49 @@ namespace Pathfinding
                 {
                     target.GetComponent<MeshRenderer>().material.color = reachableColor;
                     FindPath(hit.point);
+                    MapManager.instance.DrawPath(targetPath);
                 }
                 else
                 {
                     target.GetComponent<MeshRenderer>().material.color = unreachableColor;
                 }
             }
+
+            if (targetPath != null && pathIndex < targetPath.Count)
+            {
+                FollowPath();
+            }
+        }
+
+        private float GetPathCost(List<Node> path)
+        {
+            float cost = 0;
+            for (int i = 1;  i < path.Count; i++)
+            {
+                Node node = path[i];
+                Node prev = path[0];
+
+                cost += Vector3.Distance(node.transform.position, prev.transform.position);
+            }
+            return cost;
+        }
+
+        private float PriorityFunction(List<Node> path, Node goal)
+        {
+            Node last = path[path.Count - 1];
+            Vector3 lastPos = last.transform.position;
+            Vector3 goalPos = goal.transform.position;
+
+            switch (heuristic)
+            {
+                case HeuristicType.Distance:
+                    return (1f - heuristicWeight) * GetPathCost(path) + heuristicWeight * Vector3.Distance(lastPos, goalPos);
+                case HeuristicType.ManhattanDistance:
+                    Vector3 manDist = goalPos - lastPos;
+                    return (1f - heuristicWeight) * GetPathCost(path) + heuristicWeight * (manDist.x + manDist.y + manDist.z);
+            }
+
+            return 0f;
         }
 
         private void FindPath(Vector3 destination)
@@ -99,7 +149,7 @@ namespace Pathfinding
             int maxRange = Mathf.Max(MapManager.instance.mapData.width, MapManager.instance.mapData.height);
 
             // find the nearest starting point in the corner graph
-            Node start;
+            Node start = null;
             float minDist = Mathf.Infinity;
             for (int i = 10; i < maxRange + 10; i += 10)
             {
@@ -120,12 +170,13 @@ namespace Pathfinding
                         }
                     }
 
+                    Debug.Log("Found start node");
                     break;
                 }
             }
 
             // find the nearest ending point in the corner graph
-            Node end;
+            Node end = null;
             minDist = Mathf.Infinity;
             for (int i = 10; i < maxRange + 10; i += 10)
             {
@@ -146,22 +197,61 @@ namespace Pathfinding
                         }
                     }
 
+                    Debug.Log("Found end node");
                     break;
                 }
             }
 
             // use A* to find the shortest path
-            List<Node> path = new List<Node>();
+            List<Node> minPath = new List<Node>();
             HashSet<Node> visited = new HashSet<Node>();
-        }
-    }
+            PriorityQueue<List<Node>, float> fringe = new PriorityQueue<List<Node>, float>();
 
-    public class PriorityFunction : IComparer<Node>
-    {
-        public int Compare(Node x, Node y)
+            List<Node> startPath = new List<Node>(new Node[] { start });
+            fringe.Enqueue(startPath, PriorityFunction(startPath, end));
+            while (fringe.Count > 0)
+            {
+                List<Node> path = fringe.Dequeue();
+                Node node = path[path.Count - 1];
+
+                // current node is the goal
+                if (node == end)
+                {
+                    minPath = path;
+                    break;
+                }
+
+                if (visited.Contains(node))
+                    continue;
+
+                foreach (Node next in node.neighbors)
+                {
+                    List<Node> newPath = new List<Node>(path);
+                    newPath.Add(next);
+                    fringe.Enqueue(newPath, PriorityFunction(newPath, end));
+                }
+            }
+
+            // parse the Node-path into a Vector3-path
+            List<Vector3> points = new List<Vector3>();
+            points.Add(transform.position);
+            foreach (Node node in minPath)
+            {
+                points.Add(node.transform.position);
+            }
+            points.Add(destination);
+
+            targetPath = points;
+            pathIndex = 0;
+        }
+
+        private void FollowPath()
         {
-            // TODO: Implement priority function
-            return 0;
+            agent.SetDestination(targetPath[pathIndex]);
+            if (agent.remainingDistance < .2f)
+            {
+                pathIndex++;
+            }
         }
     }
 }

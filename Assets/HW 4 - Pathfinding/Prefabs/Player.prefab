@@ -134,7 +134,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2ae36768ea41ba4a8d02f547dc661d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  heuristic: 0
+  heuristicWeight: 0
   cursorTargetPrefab: {fileID: 5578850995634925481, guid: 9889bdd9d7e01a444b080b734e9141a4, type: 3}
   targetPrefab: {fileID: 5578850995634925481, guid: 9889bdd9d7e01a444b080b734e9141a4, type: 3}
   reachableColor: {r: 0.21226418, g: 1, b: 0.3862557, a: 0}
   unreachableColor: {r: 1, g: 0.2216981, b: 0.2216981, a: 0}
+  graphMask:
+    serializedVersion: 2
+    m_Bits: 256
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 8

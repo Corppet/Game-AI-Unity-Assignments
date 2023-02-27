@@ -179,6 +179,16 @@ namespace Pathfinding
             GameManager.instance.ResetPlayer();
         }
 
+        public void DrawPath(List<Vector3> path)
+        {
+            LineRenderer renderer = graphSettings.pathRenderer;
+            renderer.positionCount = path.Count;
+            for (int i = 0; i < path.Count; i++)
+            {
+                renderer.SetPosition(i, path[i]);
+            }
+        }
+
         private void Awake()
         {
             if (instance == null)
