@@ -18,7 +18,7 @@ namespace Pathfinding
         [HideInInspector] public HeuristicType heuristic;
 
         [Range(0f, 1f)]
-        public float heuristicWeight;
+        public float heuristicWeight = .5f;
 
         [SerializeField] private GameObject cursorTargetPrefab;
         [SerializeField] private GameObject targetPrefab;
@@ -43,6 +43,8 @@ namespace Pathfinding
         private void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
+
+            heuristic = HeuristicType.Distance;
         }
 
         private void Update()
@@ -230,6 +232,8 @@ namespace Pathfinding
                     newPath.Add(next);
                     fringe.Enqueue(newPath, PriorityFunction(newPath, end));
                 }
+
+                visited.Add(node);
             }
 
             // parse the Node-path into a Vector3-path
@@ -247,10 +251,12 @@ namespace Pathfinding
 
         private void FollowPath()
         {
+            Debug.Log(Vector3.Distance(agent.destination, transform.position));
             agent.SetDestination(targetPath[pathIndex]);
-            if (agent.remainingDistance < .2f)
+            if (Vector3.Distance(agent.destination, transform.position) < 1.5f)
             {
                 pathIndex++;
+                Debug.Log(pathIndex);
             }
         }
     }
