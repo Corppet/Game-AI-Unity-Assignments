@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using TMPro;
 
 namespace Pathfinding
 {
@@ -14,18 +15,29 @@ namespace Pathfinding
         [HideInInspector] public MapData mapData;
         [HideInInspector] public List<Node> nodes;
 
+        public MapTiles mapTiles;
+        public GraphSettings graphSettings;
+
         [SerializeField] private TextAsset[] mapFiles;
-        [SerializeField] private MapTiles mapTiles;
-        [SerializeField] private GraphSettings graphSettings;
 
         [Space(5)]
 
         [SerializeField] private float playerOffset = 2f;
 
+        [Space(5)]
+
+        [SerializeField] private TMP_Dropdown mapDropdown;
+
+        public void UpdateMap()
+        {
+            GameManager.instance.player.StopAllCoroutines();
+            graphSettings.pathRenderer.positionCount = 0;
+            ProcessMapFile(mapFiles[mapDropdown.value]);
+            LoadMap();
+        }
+
         public void ProcessMapFile(TextAsset file)
         {
-            Debug.Log("Processing map \"" + file?.name + "\"");
-
             /*
              * map format
              * 
@@ -116,10 +128,14 @@ namespace Pathfinding
             }
 
             // clear the graph
-            foreach (Node node in nodes)
+            foreach (Transform child in graphSettings.parent)
             {
-                Destroy(node.gameObject);
+                Destroy(child.gameObject);
                 nodes.Clear();
+            }
+            foreach (Transform child in graphSettings.searchParent)
+            {
+                Destroy(child.gameObject);
             }
 
             // load the map data
@@ -147,7 +163,9 @@ namespace Pathfinding
                     switch (tile)
                     {
                         case '@':
-                            // empty tile
+                            // invisible tile
+                            Instantiate(mapTiles.invisibleBlock, obstaclePos, Quaternion.identity, 
+                                obstacle.transform);
                             break;
                         case '.':
                             // ground tile
@@ -174,19 +192,9 @@ namespace Pathfinding
             }
 
             // update the navmesh
-            mapTiles.groundSurface.BuildNavMesh();
+            //mapTiles.groundSurface.BuildNavMesh();
             BuildGraph();
             GameManager.instance.ResetPlayer();
-        }
-
-        public void DrawPath(List<Vector3> path)
-        {
-            LineRenderer renderer = graphSettings.pathRenderer;
-            renderer.positionCount = path.Count;
-            for (int i = 0; i < path.Count; i++)
-            {
-                renderer.SetPosition(i, path[i]);
-            }
         }
 
         private void Awake()
@@ -205,6 +213,8 @@ namespace Pathfinding
 
         private void Start()
         {
+            SetupDropdown();
+
             if (mapFiles.Length > 0)
             {
                 ProcessMapFile(mapFiles[0]);
@@ -214,6 +224,21 @@ namespace Pathfinding
             {
                 Debug.LogError("No map files found");
             }
+        }
+
+        private void SetupDropdown()
+        {
+            // add the map names to the dropdown
+            List<string> mapNames = new List<string>();
+            foreach (TextAsset file in mapFiles)
+            {
+                mapNames.Add(file.name);
+            }
+
+            // set the dropdown options
+            mapDropdown.ClearOptions();
+            mapDropdown.AddOptions(mapNames);
+            mapDropdown.value = 0;
         }
 
         private bool isInBounds(int x, int z)
@@ -273,7 +298,7 @@ namespace Pathfinding
                         Tilemap ground = mapTiles.groundMap;
                         Vector3 nodePos = new Vector3(
                             ground.tileAnchor.x + x, 
-                            mapTiles.cellSize.y + ground.tileAnchor.y + graphSettings.offsetFromGround,
+                            mapTiles.cellSize.y + ground.tileAnchor.y + graphSettings.nodeOffset,
                             ground.tileAnchor.z + z);
                         GameObject node = Instantiate(graphSettings.nodePrefab, nodePos, Quaternion.identity, graphSettings.parent);
                         nodes.Add(node.GetComponent<Node>());
@@ -303,6 +328,7 @@ namespace Pathfinding
         [Space(5)]
 
         public GameObject obstacle;
+        public GameObject invisibleBlock;
         public Tilemap obstacleMap;
     }
 
@@ -319,12 +345,19 @@ namespace Pathfinding
     public struct GraphSettings
     {
         [Tooltip("The offset of the node from the ground.")]
-        public float offsetFromGround;
+        public float nodeOffset;
+        [Tooltip("The offset of the path from the ground.")]
+        public float pathOffset;
 
         [Space(5)]
 
         public GameObject nodePrefab;
         public LineRenderer pathRenderer;
         public Transform parent;
+
+        [Space(5)]
+
+        public GameObject searchEdgePrefab;
+        public Transform searchParent;
     }
 }

@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Tilemaps;
 
 namespace Pathfinding
 {
@@ -12,14 +14,11 @@ namespace Pathfinding
         ManhattanDistance
     }
 
-    [RequireComponent(typeof(NavMeshAgent))]
     public class PlayerController : MonoBehaviour
     {
-        [HideInInspector] public HeuristicType heuristic;
+        [HideInInspector] public float speed;
 
-        [Range(0f, 1f)]
-        public float heuristicWeight = .5f;
-
+        [Header("Cursor Settings")]
         [SerializeField] private GameObject cursorTargetPrefab;
         [SerializeField] private GameObject targetPrefab;
         [SerializeField] private Color reachableColor;
@@ -27,24 +26,27 @@ namespace Pathfinding
 
         [Space(5)]
 
+        [Header("Pathfinding Settings")]
         [SerializeField] private LayerMask graphMask;
         [SerializeField] private LayerMask obstacleMask;
+        [HideInInspector] public HeuristicType heuristic;
+        [HideInInspector] public float heuristicWeight;
+        [HideInInspector] public float searchDelay;
 
-        private NavMeshAgent agent;
 
         private GameObject cursorTarget;
         private MeshRenderer cursorRenderer;
         private bool isReachable;
 
+        private bool isSearching;
+        private Coroutine searchCoroutine;
         private GameObject target;
         private List<Vector3> targetPath;
         private int pathIndex;
 
         private void Awake()
         {
-            agent = GetComponent<NavMeshAgent>();
-
-            heuristic = HeuristicType.Distance;
+            isSearching = false;
         }
 
         private void Update()
@@ -100,8 +102,12 @@ namespace Pathfinding
                 if (isReachable)
                 {
                     target.GetComponent<MeshRenderer>().material.color = reachableColor;
-                    FindPath(hit.point);
-                    MapManager.instance.DrawPath(targetPath);
+                    if (isSearching)
+                    {
+                        StopCoroutine(searchCoroutine);
+                        isSearching = false;
+                    }
+                    searchCoroutine = StartCoroutine(FindPath(hit.point));
                 }
                 else
                 {
@@ -109,7 +115,7 @@ namespace Pathfinding
                 }
             }
 
-            if (targetPath != null && pathIndex < targetPath.Count)
+            if (!isSearching && targetPath != null && pathIndex < targetPath.Count)
             {
                 FollowPath();
             }
@@ -146,9 +152,12 @@ namespace Pathfinding
             return 0f;
         }
 
-        private void FindPath(Vector3 destination)
+        private IEnumerator FindPath(Vector3 destination)
         {
-            int maxRange = Mathf.Max(MapManager.instance.mapData.width, MapManager.instance.mapData.height);
+            isSearching = true;
+
+            MapManager map = MapManager.instance;
+            int maxRange = Mathf.Max(map.mapData.width, map.mapData.height);
 
             // find the nearest starting point in the corner graph
             Node start = null;
@@ -172,7 +181,6 @@ namespace Pathfinding
                         }
                     }
 
-                    Debug.Log("Found start node");
                     break;
                 }
             }
@@ -199,9 +207,14 @@ namespace Pathfinding
                         }
                     }
 
-                    Debug.Log("Found end node");
                     break;
                 }
+            }
+
+            // clear all the search edges
+            foreach (Transform child in map.graphSettings.searchParent)
+            {
+                Destroy(child.gameObject);
             }
 
             // use A* to find the shortest path
@@ -213,11 +226,28 @@ namespace Pathfinding
             fringe.Enqueue(startPath, PriorityFunction(startPath, end));
             while (fringe.Count > 0)
             {
+                yield return new WaitForSeconds(searchDelay);
+
                 List<Node> path = fringe.Dequeue();
                 Node node = path[path.Count - 1];
 
-                // current node is the goal
-                if (node == end)
+                // if there is an edge in the path, render the last one
+                if (path.Count > 1)
+                {
+                    GraphSettings gs = map.graphSettings;
+                    LineRenderer edge = Instantiate(gs.searchEdgePrefab, gs.searchParent)
+                        .GetComponent<LineRenderer>();
+                    edge.positionCount = 2;
+                    edge.SetPosition(0, path[path.Count - 2].transform.position);
+                    edge.SetPosition(1, node.transform.position);
+                }
+
+                // Special Case: Current node can see the goal
+                //               or the goal is the last node in the path
+                Vector3 direction = destination - node.transform.position;
+                RaycastHit hit;
+                if (!Physics.Raycast(node.transform.position, direction.normalized, out hit, direction.magnitude, 
+                    obstacleMask | graphMask) || node == end)
                 {
                     minPath = path;
                     break;
@@ -228,8 +258,10 @@ namespace Pathfinding
 
                 foreach (Node next in node.neighbors)
                 {
-                    List<Node> newPath = new List<Node>(path);
-                    newPath.Add(next);
+                    List<Node> newPath = new List<Node>(path)
+                    {
+                        next
+                    };
                     fringe.Enqueue(newPath, PriorityFunction(newPath, end));
                 }
 
@@ -237,26 +269,53 @@ namespace Pathfinding
             }
 
             // parse the Node-path into a Vector3-path
-            List<Vector3> points = new List<Vector3>();
-            points.Add(transform.position);
+            List<Vector3> points = new List<Vector3>
+            {
+                transform.position
+            };
             foreach (Node node in minPath)
             {
                 points.Add(node.transform.position);
             }
             points.Add(destination);
 
+            // flatten the path to the ground + pathOffset
+            for (int i = 0; i < points.Count; i++)
+            {
+                points[i] = new Vector3(
+                    points[i].x,
+                    map.mapTiles.cellSize.y + map.mapTiles.groundMap.tileAnchor.y
+                    + map.graphSettings.pathOffset,
+                    points[i].z);
+            }
+
             targetPath = points;
             pathIndex = 0;
+
+            DrawPath();
+
+            isSearching = false;
         }
 
         private void FollowPath()
         {
-            Debug.Log(Vector3.Distance(agent.destination, transform.position));
-            agent.SetDestination(targetPath[pathIndex]);
-            if (Vector3.Distance(agent.destination, transform.position) < 1.5f)
+            Vector3 destination = new Vector3(targetPath[pathIndex].x,
+                transform.position.y, 
+                targetPath[pathIndex].z);
+            transform.position = Vector3.MoveTowards(transform.position, destination, speed * Time.deltaTime);
+            if (Vector3.Distance(destination, transform.position) < .01f)
             {
                 pathIndex++;
-                Debug.Log(pathIndex);
+            }
+        }
+
+        private void DrawPath()
+        {
+            LineRenderer renderer = MapManager.instance.graphSettings.pathRenderer;
+            renderer.positionCount = targetPath.Count;
+            for (int i = 0; i < targetPath.Count; i++)
+            {
+                renderer.SetPosition(i, targetPath[i]);
             }
         }
     }

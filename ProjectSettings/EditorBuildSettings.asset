@@ -32,4 +32,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/LE - Behaviour Trees/Behaviour Trees.unity
     guid: a41b0310b7ee342e3a9cc4bf20720683
+  - enabled: 1
+    path: Assets/HW 4 - Pathfinding/Pathfinding.unity
+    guid: a5896154153819349b8a2772c64edc95
   m_configObjects: {}
