@@ -119,8 +119,10 @@ public class HummingbirdAgent : Agent
         // Don't take actions if frozen
         if (frozen) return;
 
+        ActionSegment<float> vectorAction = actions.ContinuousActions;
+
         // Calculate movement vector
-        Vector3 move = new Vector3(actions.ContinuousActions[0], actions.ContinuousActions[1], actions.ContinuousActions[2]);
+        Vector3 move = new Vector3(vectorAction[0], vectorAction[1], vectorAction[2]);
 
         // Add force in the direction of the move vector
         rigidbody.AddForce(move * moveForce);
@@ -129,8 +131,8 @@ public class HummingbirdAgent : Agent
         Vector3 rotationVector = transform.rotation.eulerAngles;
 
         // Calculate pitch and yaw rotation
-        float pitchChange = actions.ContinuousActions[3];
-        float yawChange = actions.ContinuousActions[4];
+        float pitchChange = vectorAction[3];
+        float yawChange = vectorAction[4];
 
         // Calculate smooth rotation changes
         smoothPitchChange = Mathf.MoveTowards(smoothPitchChange, pitchChange, 2f * Time.fixedDeltaTime);
@@ -190,7 +192,7 @@ public class HummingbirdAgent : Agent
     /// <see cref="OnActionReceived(float[])"/> instead of using the neural network
     /// </summary>
     /// <param name="actionsOut">And output action array</param>
-    public override void Heuristic(in ActionBuffers actionsOut)
+    public override void Heuristic(in ActionBuffers actionsOutBuffer)
     {
         // Create placeholders for all movement/turning
         Vector3 forward = Vector3.zero;
@@ -226,12 +228,12 @@ public class HummingbirdAgent : Agent
         Vector3 combined = (forward + left + up).normalized;
 
         // Add the 3 movement values, pitch, and yaw to the actionsOut array
-        float[] actions = new float[5];
-        actions[0] = combined.x;
-        actions[1] = combined.y;
-        actions[2] = combined.z;
-        actions[3] = pitch;
-        actions[4] = yaw;
+        ActionSegment<float> actionsOut = actionsOutBuffer.ContinuousActions;
+        actionsOut[0] = combined.x;
+        actionsOut[1] = combined.y;
+        actionsOut[2] = combined.z;
+        actionsOut[3] = pitch;
+        actionsOut[4] = yaw;
     }
 
     /// <summary>
