@@ -357,7 +357,7 @@ namespace Hummingbird
         {
             foreach (Flower flower in flowerArea.Flowers)
             {
-                if (nearestFlower == null && flower.HasNectar)
+                if (nearestFlower is null && flower.HasNectar)
                 {
                     // No current nearest flower and this flower has nectar, so set to this flower
                     nearestFlower = flower;
@@ -467,7 +467,7 @@ namespace Hummingbird
         private void FixedUpdate()
         {
             // Avoids scenario where nearest flower nectar is stolen by opponent and not updated
-            if (nearestFlower != null && !nearestFlower.HasNectar)
+            if (nearestFlower is not null && !nearestFlower.HasNectar)
                 UpdateNearestFlower();
         }
     }
