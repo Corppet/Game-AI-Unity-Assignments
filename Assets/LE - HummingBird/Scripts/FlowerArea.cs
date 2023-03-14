@@ -69,7 +69,10 @@ namespace Hummingbird
             flowerPlants = new();
             nectarFlowerDictionary = new();
             Flowers = new();
+        }
 
+        private void Start()
+        {
             // Find all flowers that are children of this GameObject/Transform
             FindChildFlowers(transform);
         }
@@ -82,7 +85,7 @@ namespace Hummingbird
         {
             foreach (Transform child in parent)
             {
-                if (child.CompareTag("flower_plant"))
+                if (child.CompareTag("Flower Plant"))
                 {
                     // Found a flower plant, add it to the flowerPlants list
                     flowerPlants.Add(child.gameObject);

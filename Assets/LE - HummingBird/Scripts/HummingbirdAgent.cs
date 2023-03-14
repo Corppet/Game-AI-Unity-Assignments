@@ -397,13 +397,13 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Handles when the agen'ts collider enters or stays in a trigger collider.
+        /// Handles when the agent's collider enters or stays in a trigger collider.
         /// </summary>
         /// <param name="collider">The trigger collider</param>
         private void TriggerEnterOrStay(Collider collider)
         {
             // Check if agent is colliding with nectar
-            if (collider.CompareTag("nectar"))
+            if (collider.CompareTag("Nectar"))
             {
                 Vector3 closestPointToBeakTip = collider.ClosestPoint(beakTip.position);
 
@@ -444,7 +444,7 @@ namespace Hummingbird
         /// <param name="collision">The collision info</param>
         private void OnCollisionEnter(Collision collision)
         {
-            if (trainingMode && collision.collider.CompareTag("boundary"))
+            if (trainingMode && collision.collider.CompareTag("Boundary"))
             {
                 // Collided with the area boundary, give a negative reward
                 AddReward(-.5f);

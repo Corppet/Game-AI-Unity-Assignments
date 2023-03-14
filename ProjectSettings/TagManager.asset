@@ -7,6 +7,9 @@ TagManager:
   - Platform
   - Moving Obstacle
   - Still Obstacle
+  - Boundary
+  - Flower Plant
+  - Nectar
   layers:
   - Default
   - TransparentFX
