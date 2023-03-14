@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.MLAgents;
+﻿using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
@@ -9,7 +6,7 @@ using UnityEngine;
 namespace Hummingbird
 {
     /// <summary>
-    /// A hummingbird Machine Learning Agent
+    /// A hummingbird Machine Learning Agent.
     /// </summary>
     public class HummingbirdAgent : Agent
     {
@@ -31,37 +28,53 @@ namespace Hummingbird
         [Tooltip("Whether this is training mode or gameplay mode")]
         public bool trainingMode;
 
-        // The rigidbody of the agent
+        /// <summary>
+        /// The rigidbody of the agent.
+        /// </summary>
         new private Rigidbody rigidbody;
 
-        // The flower area that the agent is in
+        /// <summary>
+        /// The flower area that the agent is in.
+        /// </summary>
         private FlowerArea flowerArea;
 
-        // The nearest flower to the agent
+        /// <summary>
+        /// The nearest flower to the agent.
+        /// </summary>
         private Flower nearestFlower;
 
-        // Allows for smoother pitch changes
+        /// <summary>
+        /// Allows for smoother pitch changes.
+        /// </summary>
         private float smoothPitchChange = 0f;
 
-        // Allows for smoother yaw changes
+        /// <summary>
+        /// Allows for smoother yaw changes.
+        /// </summary>
         private float smoothYawChange = 0f;
 
-        // Maximum angle that the bird can pitch up or down
+        /// <summary>
+        /// Maximum angle that the bird can pitch up or down.
+        /// </summary>
         private const float MaxPitchAngle = 80f;
 
-        // Maximum distance from the beak tip to accept nectar collision
+        /// <summary>
+        /// Maximum distance from the beak tip to accept nectar collision.
+        /// </summary>
         private const float BeakTipRadius = 0.008f;
 
-        // Whether the agent is frozen (intentionally not flying)
+        /// <summary>
+        /// Whether the agent is frozen (intentionally not flying).
+        /// </summary>
         private bool frozen = false;
 
         /// <summary>
-        /// The amount of nectar the agent has obtained this episode
+        /// The amount of nectar the agent has obtained this episode.
         /// </summary>
         public float NectarObtained { get; private set; }
 
         /// <summary>
-        /// Initialize the agent
+        /// Initialize the agent.
         /// </summary>
         public override void Initialize()
         {
@@ -69,11 +82,12 @@ namespace Hummingbird
             flowerArea = GetComponentInParent<FlowerArea>();
 
             // If not training mode, no max step, play forever
-            if (!trainingMode) MaxStep = 0;
+            if (!trainingMode) 
+                MaxStep = 0;
         }
 
         /// <summary>
-        /// Reset the agent when an episode begins
+        /// Reset the agent when an episode begins.
         /// </summary>
         public override void OnEpisodeBegin()
         {
@@ -95,7 +109,7 @@ namespace Hummingbird
             if (trainingMode)
             {
                 // Spawn in front of flower 50% of the time during training
-                inFrontOfFlower = UnityEngine.Random.value > .5f;
+                inFrontOfFlower = Random.value > .5f;
             }
 
             // Move the agent to a new random position
@@ -106,20 +120,23 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Called when and action is received from either the player input or the neural network
+        /// <para>Called when and action is received from either the player input or the neural network.</para>
         /// 
-        /// vectorAction[i] represents:
-        /// Index 0: move vector x (+1 = right, -1 = left)
-        /// Index 1: move vector y (+1 = up, -1 = down)
-        /// Index 2: move vector z (+1 = forward, -1 = backward)
-        /// Index 3: pitch angle (+1 = pitch up, -1 = pitch down)
-        /// Index 4: yaw angle (+1 = turn right, -1 = turn left)
+        /// <c>vectorAction[i]</c> represents:
+        /// <list type="bullet">
+        ///     <item>Index 0: move vector <c>x</c> (+1 = right, -1 = left)</item>
+        ///     <item>Index 1: move vector <c>y</c> (+1 = up, -1 = down)</item>
+        ///     <item>Index 2: move vector <c>z</c> (+1 = forward, -1 = backward)</item>
+        ///     <item>Index 3: pitch angle (+1 = pitch up, -1 = pitch down)</item>
+        ///     <item>Index 4: yaw angle (+1 = turn right, -1 = turn left)</item>
+        /// </list>
         /// </summary>
         /// <param name="vectorAction">The actions to take</param>
         public override void OnActionReceived(ActionBuffers actions)
         {
             // Don't take actions if frozen
-            if (frozen) return;
+            if (frozen) 
+                return;
 
             ActionSegment<float> vectorAction = actions.ContinuousActions;
 
@@ -143,7 +160,8 @@ namespace Hummingbird
             // Calculate new pitch and yaw based on smoothed values
             // Clamp  pitch to avoid flipping upside down
             float pitch = rotationVector.x + smoothPitchChange * Time.fixedDeltaTime * pitchSpeed;
-            if (pitch > 180f) pitch -= 360f;
+            if (pitch > 180f) 
+                pitch -= 360f;
             pitch = Mathf.Clamp(pitch, -MaxPitchAngle, MaxPitchAngle);
 
             float yaw = rotationVector.y + smoothYawChange * Time.fixedDeltaTime * yawSpeed;
@@ -153,13 +171,13 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Collect vector observations from the environment
+        /// Collect vector observations from the environment.
         /// </summary>
         /// <param name="sensor">The vector sensor</param>
         public override void CollectObservations(VectorSensor sensor)
         {
             // If nearestFlower is null, observe an empty array and return early
-            if (nearestFlower == null)
+            if (nearestFlower is null)
             {
                 sensor.AddObservation(new float[10]);
                 return;
@@ -191,7 +209,7 @@ namespace Hummingbird
         /// <summary>
         /// When Behavior Type is set to "Heuristic Only" on the agent's Behavior Parameters,
         /// this function will be called. Its return values will be fed into
-        /// <see cref="OnActionReceived(float[])"/> instead of using the neural network
+        /// <c><see cref="OnActionReceived"/></c> instead of using the neural network.
         /// </summary>
         /// <param name="actionsOut">And output action array</param>
         public override void Heuristic(in ActionBuffers actionsOutBuffer)
@@ -207,24 +225,32 @@ namespace Hummingbird
             // All values should be between -1 and +1
 
             // Forward/backward
-            if (Input.GetKey(KeyCode.W)) forward = transform.forward;
-            else if (Input.GetKey(KeyCode.S)) forward = -transform.forward;
+            if (Input.GetKey(KeyCode.W)) 
+                forward = transform.forward;
+            else if (Input.GetKey(KeyCode.S)) 
+                forward = -transform.forward;
 
             // Left/right
             if (Input.GetKey(KeyCode.A)) left = -transform.right;
             else if (Input.GetKey(KeyCode.D)) left = transform.right;
 
             // Up/down
-            if (Input.GetKey(KeyCode.E)) up = transform.up;
-            else if (Input.GetKey(KeyCode.C)) up = -transform.up;
+            if (Input.GetKey(KeyCode.E)) 
+                up = transform.up;
+            else if (Input.GetKey(KeyCode.C)) 
+                up = -transform.up;
 
             // Pitch up/down
-            if (Input.GetKey(KeyCode.UpArrow)) pitch = 1f;
-            else if (Input.GetKey(KeyCode.DownArrow)) pitch = -1f;
+            if (Input.GetKey(KeyCode.UpArrow)) 
+                pitch = 1f;
+            else if (Input.GetKey(KeyCode.DownArrow)) 
+                pitch = -1f;
 
             // Turn left/right
-            if (Input.GetKey(KeyCode.LeftArrow)) yaw = -1f;
-            else if (Input.GetKey(KeyCode.RightArrow)) yaw = 1f;
+            if (Input.GetKey(KeyCode.LeftArrow)) 
+                yaw = -1f;
+            else if (Input.GetKey(KeyCode.RightArrow)) 
+                yaw = 1f;
 
             // Combine the movement vectors and normalize
             Vector3 combined = (forward + left + up).normalized;
@@ -239,7 +265,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Prevent the agent from moving and taking actions
+        /// Prevent the agent from moving and taking actions.
         /// </summary>
         public void FreezeAgent()
         {
@@ -249,7 +275,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Resume agent movement and actions
+        /// Resume agent movement and actions.
         /// </summary>
         public void UnfreezeAgent()
         {
@@ -260,7 +286,7 @@ namespace Hummingbird
 
         /// <summary>
         /// Move the agent to a safe random position (i.e. does not collide with anything)
-        /// If in front of flower, also point the beak at the flower
+        /// If in front of flower, also point the beak at the flower.
         /// </summary>
         /// <param name="inFrontOfFlower">Whether to choose a spot in front of a flower</param>
         private void MoveToSafeRandomPosition(bool inFrontOfFlower)
@@ -268,7 +294,7 @@ namespace Hummingbird
             bool safePositionFound = false;
             int attemptsRemaining = 100; // Prevent an infinite loop
             Vector3 potentialPosition = Vector3.zero;
-            Quaternion potentialRotation = new Quaternion();
+            Quaternion potentialRotation = new();
 
             // Loop until a safe position is found or we run out of attempts
             while (!safePositionFound && attemptsRemaining > 0)
@@ -277,11 +303,13 @@ namespace Hummingbird
                 if (inFrontOfFlower)
                 {
                     // Pick a random flower
-                    Flower randomFlower = flowerArea.Flowers[UnityEngine.Random.Range(0, flowerArea.Flowers.Count)];
+                    Flower randomFlower = flowerArea.Flowers[Random.Range(0, 
+                        flowerArea.Flowers.Count)];
 
                     // Position 10 to 20 cm in front of the flower
-                    float distanceFromFlower = UnityEngine.Random.Range(.1f, .2f);
-                    potentialPosition = randomFlower.transform.position + randomFlower.FlowerUpVector * distanceFromFlower;
+                    float distanceFromFlower = Random.Range(.1f, .2f);
+                    potentialPosition = randomFlower.transform.position + randomFlower.FlowerUpVector 
+                        * distanceFromFlower;
 
                     // Point beak at flower (bird's head is center of transform)
                     Vector3 toFlower = randomFlower.FlowerCenterPosition - potentialPosition;
@@ -290,20 +318,21 @@ namespace Hummingbird
                 else
                 {
                     // Pick a random height from the ground
-                    float height = UnityEngine.Random.Range(1.2f, 2.5f);
+                    float height = Random.Range(1.2f, 2.5f);
 
                     // Pick a random radius from the center of the area
-                    float radius = UnityEngine.Random.Range(2f, 7f);
+                    float radius = Random.Range(2f, 7f);
 
                     // Pick a random direction rotated around the y axis
-                    Quaternion direction = Quaternion.Euler(0f, UnityEngine.Random.Range(-180f, 180f), 0f);
+                    Quaternion direction = Quaternion.Euler(0f, Random.Range(-180f, 180f), 0f);
 
                     // Combine height, radius, and direction to pick a potential position
-                    potentialPosition = flowerArea.transform.position + Vector3.up * height + direction * Vector3.forward * radius;
+                    potentialPosition = flowerArea.transform.position + Vector3.up * height + direction 
+                        * Vector3.forward * radius;
 
                     // Choose and set random starting pitch and yaw
-                    float pitch = UnityEngine.Random.Range(-60f, 60f);
-                    float yaw = UnityEngine.Random.Range(-180f, 180f);
+                    float pitch = Random.Range(-60f, 60f);
+                    float yaw = Random.Range(-180f, 180f);
                     potentialRotation = Quaternion.Euler(pitch, yaw, 0f);
                 }
 
@@ -322,7 +351,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Update the nearest flower to the agent
+        /// Update the nearest flower to the agent.
         /// </summary>
         private void UpdateNearestFlower()
         {
@@ -337,7 +366,8 @@ namespace Hummingbird
                 {
                     // Calculate distance to this flower and distance to the current nearest flower
                     float distanceToFlower = Vector3.Distance(flower.transform.position, beakTip.position);
-                    float distanceToCurrentNearestFlower = Vector3.Distance(nearestFlower.transform.position, beakTip.position);
+                    float distanceToCurrentNearestFlower = Vector3.Distance(nearestFlower.transform.position, 
+                        beakTip.position);
 
                     // If current nearest flower is empty OR this flower is closer, update the nearest flower
                     if (!nearestFlower.HasNectar || distanceToFlower < distanceToCurrentNearestFlower)
@@ -349,7 +379,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Called when the agent's collider enters a trigger collider
+        /// Called when the agent's collider enters a trigger collider.
         /// </summary>
         /// <param name="other">The trigger collider</param>
         private void OnTriggerEnter(Collider other)
@@ -358,7 +388,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Called when the agent's collider stays in a trigger collider
+        /// Called when the agent's collider stays in a trigger collider.
         /// </summary>
         /// <param name="other">The trigger collider</param>
         private void OnTriggerStay(Collider other)
@@ -367,7 +397,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Handles when the agen'ts collider enters or stays in a trigger collider
+        /// Handles when the agen'ts collider enters or stays in a trigger collider.
         /// </summary>
         /// <param name="collider">The trigger collider</param>
         private void TriggerEnterOrStay(Collider collider)
@@ -394,7 +424,8 @@ namespace Hummingbird
                     if (trainingMode)
                     {
                         // Calculate reward for getting nectar
-                        float bonus = .02f * Mathf.Clamp01(Vector3.Dot(transform.forward.normalized, -nearestFlower.FlowerUpVector.normalized));
+                        float bonus = .02f * Mathf.Clamp01(Vector3.Dot(transform.forward.normalized, 
+                            -nearestFlower.FlowerUpVector.normalized));
                         AddReward(.01f + bonus);
                     }
 
@@ -408,7 +439,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Called when the agent collides with something solid
+        /// Called when the agent collides with something solid.
         /// </summary>
         /// <param name="collision">The collision info</param>
         private void OnCollisionEnter(Collision collision)
@@ -421,17 +452,17 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Called every frame
+        /// Called every frame.
         /// </summary>
         private void Update()
         {
             // Draw a line from the beak tip to the nearest flower
-            if (nearestFlower != null)
+            if (nearestFlower is not null)
                 Debug.DrawLine(beakTip.position, nearestFlower.FlowerCenterPosition, Color.green);
         }
 
         /// <summary>
-        /// Called every .02 seconds
+        /// Called every .02 seconds.
         /// </summary>
         private void FixedUpdate()
         {

@@ -10,26 +10,29 @@ namespace Hummingbird
     /// </summary>
     public class Flower : MonoBehaviour
     {
-        [Tooltip("The color when the flower is full")]
+        [Tooltip("The color when the flower is full.")]
         public Color fullFlowerColor = new Color(1f, 0f, .3f);
 
-        [Tooltip("The color when the flower is empty")]
+        [Tooltip("The color when the flower is empty.")]
         public Color emptyFlowerColor = new Color(.5f, 0f, 1f);
 
         /// <summary>
-        /// The trigger collider representing the nectar
+        /// The trigger collider representing the nectar.
         /// </summary>
-        [HideInInspector]
-        public Collider nectarCollider;
+        [HideInInspector] public Collider nectarCollider;
 
-        // The solid collider representing the flower petals
+        /// <summary>
+        /// The solid collider representing the flower petals.
+        /// </summary>
         private Collider flowerCollider;
 
-        // The flower's material
+        /// <summary>
+        /// The flower's material.
+        /// </summary>
         private Material flowerMaterial;
 
         /// <summary>
-        /// A vector pointing straight out of the flower
+        /// A vector pointing straight out of the flower.
         /// </summary>
         public Vector3 FlowerUpVector
         {
@@ -40,7 +43,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// The center position of the nectar collider
+        /// The center position of the nectar collider.
         /// </summary>
         public Vector3 FlowerCenterPosition
         {
@@ -51,12 +54,12 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// The amount of nectar remaining in the flower
+        /// The amount of nectar remaining in the flower.
         /// </summary>
         public float NectarAmount { get; private set; }
 
         /// <summary>
-        /// Whether the flower has any nectar remaining
+        /// Whether the flower has any nectar remaining.
         /// </summary>
         public bool HasNectar
         {
@@ -67,7 +70,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Attempts to remove nectar from the flower
+        /// Attempts to remove nectar from the flower.
         /// </summary>
         /// <param name="amount">The amount of nectar to remove</param>
         /// <returns>The actual amount successfully removed</returns>
@@ -97,7 +100,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Resets the flower
+        /// Resets the flower.
         /// </summary>
         public void ResetFlower()
         {
@@ -113,7 +116,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Called when the flower wakes up
+        /// Called when the flower wakes up.
         /// </summary>
         private void Awake()
         {

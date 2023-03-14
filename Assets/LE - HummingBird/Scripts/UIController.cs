@@ -28,17 +28,17 @@ namespace Hummingbird
         public TextMeshProUGUI buttonText;
 
         /// <summary>
-        /// Delegate for a button click
+        /// Delegate for a button click.
         /// </summary>
         public delegate void ButtonClick();
 
         /// <summary>
-        /// Called when the button is clicked
+        /// Called when the button is clicked.
         /// </summary>
         public ButtonClick OnButtonClicked;
 
         /// <summary>
-        /// Responds to button clicks
+        /// Responds to button clicks.
         /// </summary>
         public void ButtonClicked()
         {
@@ -46,7 +46,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Shows the button
+        /// Shows the button.
         /// </summary>
         /// <param name="text">The text string on the button</param>
         public void ShowButton(string text)
@@ -56,7 +56,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Hides the button
+        /// Hides the button.
         /// </summary>
         public void HideButton()
         {
@@ -64,7 +64,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Shows banner text
+        /// Shows banner text.
         /// </summary>
         /// <param name="text">The text string to show</param>
         public void ShowBanner(string text)
@@ -74,7 +74,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Hides the banner text
+        /// Hides the banner text.
         /// </summary>
         public void HideBanner()
         {
@@ -82,7 +82,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Sets the timer, if timeRemaining is negative, hides the text
+        /// Sets the timer, if timeRemaining is negative, hides the text.
         /// </summary>
         /// <param name="timeRemaining">The time remaining in seconds</param>
         public void SetTimer(float timeRemaining)
@@ -90,11 +90,11 @@ namespace Hummingbird
             if (timeRemaining > 0f)
                 timerText.text = timeRemaining.ToString("00");
             else
-                timerText.text = "";
+                timerText.text = string.Empty;
         }
 
         /// <summary>
-        /// Sets the player's nectar amount
+        /// Sets the player's nectar amount.
         /// </summary>
         /// <param name="nectarAmount">An amount between 0 and 1</param>
         public void SetPlayerNectar(float nectarAmount)
@@ -103,7 +103,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Sets the opponent's nectar amount
+        /// Sets the opponent's nectar amount.
         /// </summary>
         /// <param name="nectarAmount">An amount between 0 and 1</param>
         public void SetOpponentNectar(float nectarAmount)
