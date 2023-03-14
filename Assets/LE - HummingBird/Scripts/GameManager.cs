@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Hummingbird
 {
     /// <summary>
-    /// Manages game logic and controls the UI
+    /// Manages game logic and controls the UI.
     /// </summary>
     public class GameManager : MonoBehaviour
     {
@@ -29,11 +29,13 @@ namespace Hummingbird
         [Tooltip("The main camera for the scene")]
         public Camera mainCamera;
 
-        // When the game timer started
+        /// <summary>
+        /// When the game timer started.
+        /// </summary>
         private float gameTimerStartTime;
 
         /// <summary>
-        /// All possible game states
+        /// All possible game states.
         /// </summary>
         public enum GameState
         {
@@ -41,16 +43,16 @@ namespace Hummingbird
             MainMenu,
             Preparing,
             Playing,
-            Gameover
+            GameOver
         }
 
         /// <summary>
-        /// The current game state
+        /// The current game state.
         /// </summary>
         public GameState State { get; private set; } = GameState.Default;
 
         /// <summary>
-        /// Gets the time remaining in the game
+        /// Gets the time remaining in the game.
         /// </summary>
         public float TimeRemaining
         {
@@ -69,13 +71,13 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Handles a button click in different states
+        /// Handles a button click in different states.
         /// </summary>
         public void ButtonClicked()
         {
-            if (State == GameState.Gameover)
+            if (State == GameState.GameOver)
             {
-                // In the Gameover state, button click should go to the main menu
+                // In the GameOver state, button click should go to the main menu
                 MainMenu();
             }
             else if (State == GameState.MainMenu)
@@ -90,7 +92,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Called when the game starts
+        /// Called when the game starts.
         /// </summary>
         private void Start()
         {
@@ -102,7 +104,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Called on destroy
+        /// Called on destroy.
         /// </summary>
         private void OnDestroy()
         {
@@ -111,7 +113,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Shows the main menu
+        /// Shows the main menu.
         /// </summary>
         private void MainMenu()
         {
@@ -140,7 +142,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Starts the game with a countdown
+        /// Starts the game with a countdown.
         /// </summary>
         /// <returns>IEnumerator</returns>
         private IEnumerator StartGame()
@@ -165,7 +167,7 @@ namespace Hummingbird
             yield return new WaitForSeconds(1f);
             uiController.ShowBanner("Go!");
             yield return new WaitForSeconds(1f);
-            uiController.ShowBanner("");
+            uiController.ShowBanner(string.Empty);
 
             // Set the state to "playing"
             State = GameState.Playing;
@@ -179,12 +181,12 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Ends the game
+        /// Ends the game.
         /// </summary>
         private void EndGame()
         {
             // Set the game state to "game over"
-            State = GameState.Gameover;
+            State = GameState.GameOver;
 
             // Freeze the agents
             player.FreezeAgent();
@@ -205,7 +207,7 @@ namespace Hummingbird
         }
 
         /// <summary>
-        /// Called every frame
+        /// Called every frame.
         /// </summary>
         private void Update()
         {
@@ -224,7 +226,7 @@ namespace Hummingbird
                 uiController.SetPlayerNectar(player.NectarObtained / maxNectar);
                 uiController.SetOpponentNectar(opponent.NectarObtained / maxNectar);
             }
-            else if (State == GameState.Preparing || State == GameState.Gameover)
+            else if (State == GameState.Preparing || State == GameState.GameOver)
             {
                 // Update the timer
                 uiController.SetTimer(TimeRemaining);
