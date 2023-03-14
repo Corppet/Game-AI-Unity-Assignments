@@ -35,4 +35,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/HW 4 - Pathfinding/Pathfinding.unity
     guid: a5896154153819349b8a2772c64edc95
+  - enabled: 1
+    path: Assets/LE - HummingBird/Hummingbird.unity
+    guid: f36411d6fac4ba04a965fa55cf1487e9
   m_configObjects: {}
