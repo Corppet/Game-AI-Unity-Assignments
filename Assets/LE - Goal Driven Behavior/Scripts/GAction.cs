@@ -71,15 +71,5 @@ namespace Hospital
 
         public abstract bool PrePerform();
         public abstract bool PostPerform();
-
-        void Start()
-        {
-
-        }
-
-        void Update()
-        {
-
-        }
     }
 }
