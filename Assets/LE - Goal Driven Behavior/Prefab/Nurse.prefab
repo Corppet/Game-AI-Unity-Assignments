@@ -1044,9 +1044,10 @@ GameObject:
   m_Component:
   - component: {fileID: 177407082141715887}
   - component: {fileID: 1578806455}
-  - component: {fileID: 1578806457}
   - component: {fileID: 1578806458}
+  - component: {fileID: 1578806457}
   - component: {fileID: 1578806459}
+  - component: {fileID: 3889972471101808815}
   - component: {fileID: 1578806460}
   m_Layer: 0
   m_Name: Nurse
@@ -1093,6 +1094,20 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &1578806458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2618188073631541129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d983730aab143c47a50d04ff39b7698, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actions: []
+  currentAction: {fileID: 0}
 --- !u!114 &1578806457
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1108,7 +1123,7 @@ MonoBehaviour:
   actionName: GetPatient
   cost: 1
   target: {fileID: 0}
-  targetTag: 
+  targetTag: Wander
   duration: 0
   preconditions:
   - key: Waiting
@@ -1120,20 +1135,6 @@ MonoBehaviour:
     value: 0
   agent: {fileID: 0}
   running: 0
---- !u!114 &1578806458
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2618188073631541129}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d983730aab143c47a50d04ff39b7698, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  actions: []
-  currentAction: {fileID: 0}
 --- !u!114 &1578806459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1156,6 +1157,31 @@ MonoBehaviour:
     value: 0
   afterEffects:
   - key: treatPatient
+    value: 0
+  agent: {fileID: 0}
+  running: 0
+--- !u!114 &3889972471101808815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2618188073631541129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6837e80c13bdc4ca93928a2b174855, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionName: Action
+  cost: 1
+  target: {fileID: 0}
+  targetTag: 
+  duration: 0
+  preconditions:
+  - key: treatPatient
+    value: 0
+  afterEffects:
+  - key: wandering
     value: 0
   agent: {fileID: 0}
   running: 0

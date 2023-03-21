@@ -15,8 +15,11 @@ namespace Hospital
             SubGoal s2 = new("isTreated", 1, true);
             goals.Add(s2, 5);
 
+            SubGoal s4 = new("hasWandered", 1, true);
+            goals.Add(s4, 6);
+
             SubGoal s3 = new("isHome", 1, true);
-            goals.Add(s3, 5);
+            goals.Add(s3, 7);
         }
     }
 }

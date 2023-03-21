@@ -53,11 +53,12 @@ namespace Hospital
         {
             if (currentAction != null && currentAction.running)
             {
-                if (currentAction.agent.hasPath && currentAction.agent.remainingDistance < 1f)
+                float dist = Vector3.Distance(transform.position, currentAction.target.transform.position);
+                if (currentAction.agent.hasPath && dist < 5f)
                 {
                     if (!invoked)
                     {
-                        Invoke("CompleteAction", currentAction.duration);
+                        Invoke(nameof(CompleteAction), currentAction.duration);
                         invoked = true;
                     }
                 }

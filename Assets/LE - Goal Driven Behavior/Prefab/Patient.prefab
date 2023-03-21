@@ -2725,6 +2725,7 @@ GameObject:
   - component: {fileID: 7881807148685970267}
   - component: {fileID: 7881807148685970264}
   - component: {fileID: -1741052972038023676}
+  - component: {fileID: 8636566060926764833}
   - component: {fileID: 8820079240689544774}
   - component: {fileID: 7881807148685970266}
   - component: {fileID: -7726631391852394650}
@@ -2871,6 +2872,31 @@ MonoBehaviour:
     value: 0
   agent: {fileID: 0}
   running: 0
+--- !u!114 &8636566060926764833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7881807149238628900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6837e80c13bdc4ca93928a2b174855, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionName: Action
+  cost: 1
+  target: {fileID: 0}
+  targetTag: Wander
+  duration: 0
+  preconditions:
+  - key: isCured
+    value: 0
+  afterEffects:
+  - key: hasWandered
+    value: 0
+  agent: {fileID: 0}
+  running: 0
 --- !u!114 &8820079240689544774
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2889,7 +2915,7 @@ MonoBehaviour:
   targetTag: Home
   duration: 0
   preconditions:
-  - key: isCured
+  - key: hasWandered
     value: 0
   afterEffects:
   - key: isHome

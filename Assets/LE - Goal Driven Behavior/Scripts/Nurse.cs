@@ -13,7 +13,10 @@ namespace Hospital
             goals.Add(s1, 3);
 
             SubGoal s2 = new("rested", 1, false);
-            goals.Add(s2, 3);
+            goals.Add(s2, 4);
+
+            SubGoal s3 = new("hasWandered", 1, false);
+            goals.Add(s3, 5);
 
             Invoke(nameof(GetTired), Random.Range(10, 20));
         }

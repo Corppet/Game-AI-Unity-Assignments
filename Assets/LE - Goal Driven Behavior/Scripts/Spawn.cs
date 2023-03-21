@@ -16,13 +16,13 @@ namespace Hospital
                 Instantiate(patientPrefab, transform.position, Quaternion.identity);
             }
 
-            Invoke(nameof(SpawnPatient), 5);
+            Invoke(nameof(SpawnPatient), Random.Range(7, 10));
         }
 
         private void SpawnPatient()
         {
             Instantiate(patientPrefab, transform.position, Quaternion.identity);
-            Invoke(nameof(SpawnPatient), Random.Range(2, 10));
+            Invoke(nameof(SpawnPatient), Random.Range(7, 10));
         }
     }
 }

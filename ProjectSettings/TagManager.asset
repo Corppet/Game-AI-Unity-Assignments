@@ -10,6 +10,13 @@ TagManager:
   - Boundary
   - Flower Plant
   - Nectar
+  - Lounge
+  - WaitingArea
+  - Home
+  - Door
+  - Cubicle
+  - Reception
+  - Wander
   layers:
   - Default
   - TransparentFX
