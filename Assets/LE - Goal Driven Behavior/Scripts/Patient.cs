@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,12 +11,12 @@ namespace Hospital
             base.Start();
             SubGoal s1 = new("isWaiting", 1, true);
             goals.Add(s1, 3);
-        }
 
-        // Update is called once per frame
-        void Update()
-        {
+            SubGoal s2 = new("isTreated", 1, true);
+            goals.Add(s2, 5);
 
+            SubGoal s3 = new("isHome", 1, true);
+            goals.Add(s3, 5);
         }
     }
 }

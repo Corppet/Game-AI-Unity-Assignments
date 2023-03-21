@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Hospital
 {
-    public class GoToWaitingRoom : GAction
+    public class Rest : GAction
     {
         public override bool PrePerform()
         {
@@ -13,9 +13,7 @@ namespace Hospital
 
         public override bool PostPerform()
         {
-            GWorld.Instance.GetWorld().ModifyState("Waiting", 1);
-            GWorld.Instance.AddPatient(gameObject);
-            beliefs.ModifyState("atHospital", 1);
+            beliefs.RemoveState("exhausted");
             return true;
         }
     }

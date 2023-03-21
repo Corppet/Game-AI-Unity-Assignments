@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -11,7 +11,7 @@ namespace Hospital
         public float cost = 1.0f;
         public GameObject target;
         public string targetTag;
-        public float duration = 0f;
+        public float duration = 0;
         public WorldState[] preconditions;
         public WorldState[] afterEffects;
         public NavMeshAgent agent;
@@ -21,34 +21,35 @@ namespace Hospital
 
         public WorldStates agentBeliefs;
 
+        public GInventory inventory;
+        public WorldStates beliefs;
+
         public bool running = false;
 
-        public GAction() 
+        public GAction()
         {
             preconditionsDict = new();
             afterEffectsDict = new();
         }
 
-        private void Awake()
+        public void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
 
-            if (preconditions is not null)
-            {
-                foreach (WorldState state in preconditions)
+            if (preconditions != null)
+                foreach (WorldState w in preconditions)
                 {
-                    preconditionsDict.Add(state.key, state.value);
+                    preconditionsDict.Add(w.key, w.value);
                 }
-            }
 
-            if (afterEffects is not null)
-            {
-                foreach (WorldState state in afterEffects)
+            if (afterEffects != null)
+                foreach (WorldState w in afterEffects)
                 {
-                    afterEffectsDict.Add(state.key, state.value);
+                    afterEffectsDict.Add(w.key, w.value);
                 }
-            }
 
+            inventory = GetComponent<GAgent>().inventory;
+            beliefs = GetComponent<GAgent>().beliefs;
         }
 
         public bool IsAchievable()
@@ -58,14 +59,11 @@ namespace Hospital
 
         public bool IsAchievableGiven(Dictionary<string, int> conditions)
         {
-            foreach (KeyValuePair<string, int> kvp in conditions)
+            foreach (KeyValuePair<string, int> p in preconditionsDict)
             {
-                if (!conditions.ContainsKey(kvp.Key))
-                {
+                if (!conditions.ContainsKey(p.Key))
                     return false;
-                }
             }
-
             return true;
         }
 
