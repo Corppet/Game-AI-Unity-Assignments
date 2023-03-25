@@ -9,15 +9,24 @@
                 "auxillary_file_paths": [
                     "results/hb_02/Hummingbird/Hummingbird-41024.pt"
                 ]
+            },
+            {
+                "steps": 49024,
+                "file_path": "results/hb_02/Hummingbird/Hummingbird-49024.onnx",
+                "reward": -2.8125,
+                "creation_time": 1679419390.4769948,
+                "auxillary_file_paths": [
+                    "results/hb_02/Hummingbird/Hummingbird-49024.pt"
+                ]
             }
         ],
         "final_checkpoint": {
-            "steps": 41024,
+            "steps": 49024,
             "file_path": "results/hb_02/Hummingbird.onnx",
-            "reward": -0.6458333333333334,
-            "creation_time": 1678825171.0948598,
+            "reward": -2.8125,
+            "creation_time": 1679419390.4769948,
             "auxillary_file_paths": [
-                "results/hb_02/Hummingbird/Hummingbird-41024.pt"
+                "results/hb_02/Hummingbird/Hummingbird-49024.pt"
             ]
         }
     },
