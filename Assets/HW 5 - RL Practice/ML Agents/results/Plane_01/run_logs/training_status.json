@@ -1,0 +1,29 @@
+{
+    "Plane": {
+        "checkpoints": [
+            {
+                "steps": 337503,
+                "file_path": "results/Plane_01/Plane/Plane-337503.onnx",
+                "reward": -1.8342858859470912,
+                "creation_time": 1680156073.3322656,
+                "auxillary_file_paths": [
+                    "results/Plane_01/Plane/Plane-337503.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 337503,
+            "file_path": "results/Plane_01/Plane.onnx",
+            "reward": -1.8342858859470912,
+            "creation_time": 1680156073.3322656,
+            "auxillary_file_paths": [
+                "results/Plane_01/Plane/Plane-337503.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.30.0",
+        "torch_version": "1.8.1+cu102"
+    }
+}
